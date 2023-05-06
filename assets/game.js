@@ -118,7 +118,7 @@ var copter = {
     y: canvas.height/4,
     width: 40,
     height: 40,
-    gravity: 120,           // Гравитация
+    gravity: 0,           // Гравитация
     time: 0,                // Копим время полета и сбрасываем при прыжке
     jumpForce: 90,          // Сила прыжка
     currentJumpForce: 0,    // Текущая сила прыжка
@@ -176,9 +176,14 @@ var copter = {
 var mapManager = {
     x: 0,
     speed: 40,
+    currentSpeed: 0,
     currentMapId: 0,
     currentMap: [],
     maps: [],
+
+    turnOnMove(){
+        mapManager.currentSpeed = mapManager.speed;
+    },
 
     loadJsonMaps(){
         var url = 'assets/map.json';
@@ -221,7 +226,7 @@ var mapManager = {
     },
 
     update(){
-        mapManager.x -= mapManager.speed * (glManager.lag/1000);
+        mapManager.x -= mapManager.currentSpeed * (glManager.lag/1000);
 
         if (mapManager.x < -4656){          // Для тестирования
             mapManager.x = 0;
