@@ -1,4 +1,8 @@
+/*
+    - Реализовать плавный старт
 
+
+*/
 
 // ЗАГРУЗКА ИЗОБРАЖЕНИЙ ...........................................
 
@@ -31,7 +35,7 @@ buttonRestart.onclick = function () {
 document.addEventListener('DOMContentLoaded', function() {
 
      // Внутренний размер окна — это ширина и высота области просмотра (вьюпорта).
-    console.log(window.innerHeight);
+    // console.log(window.innerHeight);
 
     canvas.width = window.innerWidth - 200;
     if (canvas.width < 600) canvas.width = 600;
@@ -44,13 +48,14 @@ document.addEventListener('DOMContentLoaded', function() {
 // ПОЛЬЗОВАТЕЛЬСКИЙ ВВОД ..........................................
 
 // Отлавливаев клики мышкой
-document.addEventListener('click', function(evt) {
+canvas.addEventListener('click', function(evt) {
     var mousePos = getMousePos(canvas, evt);
     /*
     if (isInside(mousePos, panelPause)){
         game.isPause = false;
     }
     */
+    copter.jump();
 }, false);
 
 // Отлавливаев ввод с клавиатуры
@@ -61,6 +66,9 @@ document.addEventListener('keydown', function() {
     if (game.isPause) return;
 
     if (event.which === 38 || event.which === 87 || event.which === 32){
+        if (game.isReadyToStart){
+            game.pressKeyToStart();
+        }
         copter.jump();
     }
 });
@@ -79,8 +87,10 @@ var game = {
 
     score: 0,
     isPause: true,
+    isReadyToStart: true,
     
     pauseIsActive(flag){
+        if (game.isReadyToStart) return;
         this.isPause = flag;
         buttonContinue.style.display = flag ? "block" : "none";
         buttonPause.style.display = !flag ? "" : "none";
@@ -89,14 +99,27 @@ var game = {
         this.isPause = false;
         this.score = 0;
         scoreCounter.innerHTML = "" + game.score;
-        buttonPause.style.display = "block";
+        buttonPause.style.display = "none";
         gameOverPanel.style.display = "none";
 
-        mapManager.x = 0;
+        mapManager.turnOffMove();
+        copter.isActive = false;
+
+        mapManager.x = 0;               // Вынести в функции объекта
         copter.x = 120,
         copter.y = canvas.height/4;
         copter.currentJumpForce = 0;
         copter.time = 0;
+
+        game.isReadyToStart = true;
+    },
+
+    pressKeyToStart(){
+        if (!game.isReadyToStart) return;
+        game.isReadyToStart = false;
+        copter.isActive = true;
+        mapManager.turnOnMove();
+        buttonPause.style.display = "block";
     },
     addScore(){
         game.score++;
@@ -115,17 +138,18 @@ var config = {
 
 var copter = {
     x: 120,                  // Отступ от края должен быть кратен половину размера сетки (блока)
-    y: canvas.height/4,
+    y: canvas.height/2,
     width: 40,
     height: 40,
-    gravity: 0,           // Гравитация
+    isActive: false,
+    gravity: 120,           // Гравитация
     time: 0,                // Копим время полета и сбрасываем при прыжке
     jumpForce: 90,          // Сила прыжка
     currentJumpForce: 0,    // Текущая сила прыжка
     dampingJumpForce: 0.4,  // Демпфирование силы прыжка
 
     update() {
-        
+        if (!copter.isActive) return;
         copter.time += (glManager.lag/1000); // Получаем время между кадрами в миллесекундах (делим на 1000)
         copter.y += ((copter.gravity * copter.time) - copter.currentJumpForce) * (glManager.lag/1000); // Ускорение свободного падения минус сила прыжка
     
@@ -175,7 +199,7 @@ var copter = {
 
 var mapManager = {
     x: 0,
-    speed: 40,
+    speed: 45,
     currentSpeed: 0,
     currentMapId: 0,
     currentMap: [],
@@ -183,6 +207,10 @@ var mapManager = {
 
     turnOnMove(){
         mapManager.currentSpeed = mapManager.speed;
+    },
+
+    turnOffMove(){
+        mapManager.currentSpeed = 0;
     },
 
     loadJsonMaps(){
@@ -221,16 +249,11 @@ var mapManager = {
     },
 
     loadCurrentMap(){
-        console.log(mapManager.maps[0]);
         mapManager.currentMap = mapManager.maps[mapManager.currentMapId];
     },
 
     update(){
         mapManager.x -= mapManager.currentSpeed * (glManager.lag/1000);
-
-        if (mapManager.x < -4656){          // Для тестирования
-            mapManager.x = 0;
-        }
     },
 
     draw(){
