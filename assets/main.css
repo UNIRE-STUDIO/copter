@@ -78,7 +78,8 @@ body{
 }
 
 .canvas-wrapper {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Ccircle cx='8' cy='8' r='1' fill='%23444444'/%3E%3C/svg%3E");
+    /*background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Ccircle cx='8' cy='8' r='1' fill='%23444444'/%3E%3C/svg%3E");
+    */
     position: relative;
 }
 
@@ -119,6 +120,18 @@ body{
     text-align: center;
 }
 
+#pressKeyToStart {
+    color: #c2c2c2;
+    font-weight: bold;
+    
+    font-size: 20px;
+    text-align: center;
+    top: 40%;
+    left: calc(50% - 100px);
+    position: absolute;
+    display: flex;
+}
+
 #restart{
     width: 104px;
     height: 30px;
@@ -136,12 +149,47 @@ body{
     box-shadow:0px -4px 0 #05ac05 inset;
 }
 
+/* Уровень пройден!  ................................. */
+#finish-level{
+    color: #c2c2c2;
+    text-align: center;
+    display: none;
+    top: 40%;
+    left: calc(50% - 150px);
+    width: 300px;
+    height: 100px;
+    position: absolute;
+    border-radius: 15px;
+    background: #101013dc;
+}
+
+#next-level{
+    width: 150px;
+    height: 35px;
+    border-radius: 8px;
+    background: #070708dc;
+    border: none;
+    color: #c2c2c2;
+
+    box-shadow:0px -2px 0 #05ac05 inset;
+    transition:all 0.3s;
+}
+#next-level:hover{
+    box-shadow:0px -4px 0 #05ac05 inset;
+}
+
+/* ............................ */
 
 .footer {
     margin-top: 5px;
     display: flex;
-    justify-content: end;
+    justify-content: space-between;
     color: #b4b4b4;
+}
+
+#current-level{
+    color: #f8f8f8;
+    
 }
 
 #version {

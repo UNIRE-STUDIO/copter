@@ -31,6 +31,15 @@ buttonRestart.onclick = function () {
     game.startGame();
 }
 
+var pressKeyToStart = document.getElementById("pressKeyToStart");
+var currentLevel = document.getElementById("current-level");
+
+var finishLevel = document.getElementById("finish-level");
+var nextLevel = document.getElementById("next-level");
+nextLevel.onclick = function () {
+    
+}
+
 // ЗАГРУЗКА ДОКУМЕНТА ..........................................
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -55,6 +64,9 @@ canvas.addEventListener('click', function(evt) {
         game.isPause = false;
     }
     */
+    if (game.isReadyToStart){
+        game.pressKeyToStart();
+    }
     copter.jump();
 }, false);
 
@@ -73,18 +85,9 @@ document.addEventListener('keydown', function() {
     }
 });
 
-/* ДЕБАГ
-document.addEventListener('mousemove',function() {
-    let mousePos = getMousePos(canvas, event);
-    copter.x = mousePos.x;
-    copter.y = mousePos.y;
-});
-*/
-
 // СУЩНОСТИ ....................................................................
 
 var game = {
-
     score: 0,
     isPause: true,
     isReadyToStart: true,
@@ -101,6 +104,8 @@ var game = {
         scoreCounter.innerHTML = "" + game.score;
         buttonPause.style.display = "none";
         gameOverPanel.style.display = "none";
+        finishLevel.style.display = "none";
+        pressKeyToStart.style.display = "flex";
 
         mapManager.turnOffMove();
         copter.isActive = false;
@@ -120,6 +125,7 @@ var game = {
         copter.isActive = true;
         mapManager.turnOnMove();
         buttonPause.style.display = "block";
+        pressKeyToStart.style.display = "none";
     },
     addScore(){
         game.score++;
@@ -127,8 +133,13 @@ var game = {
     },
     gameOver(){
         buttonPause.style.display = "none";
-        this.isPause = true;
+        game.isPause = true;
         gameOverPanel.style.display = "block";
+    },
+    finishLevel(){
+        game.isPause = true;
+        buttonPause.style.display = "none";
+        finishLevel.style.display = "block";
     }
 }
 
@@ -184,6 +195,13 @@ var copter = {
                 */
             }
         }
+        copter.checkEndLevel();
+    },
+
+    checkEndLevel(){
+        if (Math.abs(mapManager.x) + copter.x >= mapManager.finish){
+            game.finishLevel();
+        }
     },
 
     draw(){
@@ -203,6 +221,8 @@ var mapManager = {
     currentSpeed: 0,
     currentMapId: 0,
     currentMap: [],
+    finish: 0,            // Финишная черта уровня
+    OffsetFromTheEnd: 90, // Отступ от конца карты пересекая который мы завершаем уровень (измеряется в блоках)
     maps: [],
 
     turnOnMove(){
@@ -244,12 +264,12 @@ var mapManager = {
             var modifiedMap = columns;      // Пересобрали карту стобцами
             mapManager.maps.push(modifiedMap); // Добавляем собранную карту в массив карт
         });
-        console.log(mapManager.maps);
         mapManager.loadCurrentMap();
     },
 
     loadCurrentMap(){
         mapManager.currentMap = mapManager.maps[mapManager.currentMapId];
+        mapManager.finish = (mapManager.currentMap.length - mapManager.OffsetFromTheEnd) * config.grid;
     },
 
     update(){
