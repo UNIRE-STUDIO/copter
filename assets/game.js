@@ -173,7 +173,7 @@ var copter = {
     isActive: false,
     gravity: 120,           // Гравитация
     time: 0,                // Копим время полета и сбрасываем при прыжке
-    jumpForce: 90,          // Сила прыжка
+    jumpForce: 10,          // Сила прыжка
     currentJumpForce: 0,    // Текущая сила прыжка
     dampingJumpForce: 0.4,  // Демпфирование силы прыжка
 
