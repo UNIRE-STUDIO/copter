@@ -37,7 +37,20 @@ var currentLevel = document.getElementById("current-level");
 var finishLevel = document.getElementById("finish-level");
 var nextLevel = document.getElementById("next-level");
 nextLevel.onclick = function () {
-    
+    // Если это не последняя карта 
+    if (mapManager.maps.length-1 > mapManager.currentMapId) mapManager.currentMapId++ // То включаем следующую
+    mapManager.loadCurrentMap();
+    game.startGame();
+}
+
+var mapsButtons = document.getElementsByClassName("maps");
+for (let i = 0; i < mapsButtons.length; i++) {
+    mapsButtons[i].onclick = function () {
+        if (i === mapManager.currentMapId) return;
+        mapManager.currentMapId = i;
+        mapManager.loadCurrentMap();
+        game.startGame();
+    }
 }
 
 // ЗАГРУЗКА ДОКУМЕНТА ..........................................
@@ -48,8 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     canvas.width = window.innerWidth - 200;
     if (canvas.width < 600) canvas.width = 600;
-
-    mapManager.loadJsonMaps();
+    mapManager.initialization();
     game.startGame();
     glManager.gameLoop();
 });
@@ -137,6 +149,12 @@ var game = {
         gameOverPanel.style.display = "block";
     },
     finishLevel(){
+        // Если это не последняя карта 
+        if (mapManager.maps.length-1 > mapManager.currentMapId){
+            var saveMap = mapManager.currentMapId; // Открываем новую карту
+            saveMap++;                             // 
+            localStorage.setItem('map', saveMap);  // <--
+        } 
         game.isPause = true;
         buttonPause.style.display = "none";
         finishLevel.style.display = "block";
@@ -171,6 +189,8 @@ var copter = {
         let centerX = copter.x + (copter.width/2);
         let centerY = copter.y + (copter.height/2);
         
+        // Берем несколько блоков слева и справа от коптера и проверяем столкновения с блоками
+        // в этой области
         let leftLimit = Math.floor((Math.abs(mapManager.x)+centerX)/config.grid)-1;
         let rightLimit = leftLimit + 3; //
         
@@ -179,6 +199,7 @@ var copter = {
             for (let j = 0; j < mapManager.currentMap[i].length; j++) {
                 let block = mapManager.currentMap[i][j];
                 
+                // Проверяем пересечение квадратов
                 let collision = detectCollision({x:copter.x, y:copter.y, side:copter.width}, 
                                                 {x:block.x*config.grid+mapManager.x, y:block.y*config.grid, side:config.grid});
 
@@ -233,6 +254,13 @@ var mapManager = {
         mapManager.currentSpeed = 0;
     },
 
+    initialization(){
+        if (localStorage.getItem('map') == null) localStorage.setItem('map', 0);
+        mapManager.currentMapId = localStorage.getItem("map");
+        mapManager.loadJsonMaps();
+        mapManager.updateButtonsMap();
+    },
+
     loadJsonMaps(){
         var url = 'assets/map.json';
         fetch(url)
@@ -270,6 +298,28 @@ var mapManager = {
     loadCurrentMap(){
         mapManager.currentMap = mapManager.maps[mapManager.currentMapId];
         mapManager.finish = (mapManager.currentMap.length - mapManager.OffsetFromTheEnd) * config.grid;
+        mapManager.updateButtonsMap();
+    },
+
+    updateButtonsMap(){
+        // Перебираем меню карт
+        for (let i = 0; i < mapsButtons.length; i++) {
+
+            // Заблокированные кнопки (не пройденные карты)
+            if (localStorage.getItem("map") < i ){
+                mapsButtons[i].disabled = true;
+            }
+            else if (mapManager.currentMapId == i){
+                mapsButtons[i].disabled = false;
+                mapsButtons[i].style.width = "55px";
+                mapsButtons[i].style.height = "55px";
+            }
+            else {
+                mapsButtons[i].disabled = false;
+                mapsButtons[i].style.width = "";
+                mapsButtons[i].style.height = "";
+            }
+        }
     },
 
     update(){

@@ -10,7 +10,6 @@ body{
     display: flex;
     justify-content: center;
     align-items: center;
-    
 }
 
 #game {
@@ -18,6 +17,51 @@ body{
     background-color: #161618;
     box-shadow: 0px -1px 0 #05ac05 inset, 0px 0px 40px 10px #161618;
     border-radius: 9px;
+
+    display: flex;
+}
+
+#map-menu {
+    margin-right: 20px;
+    padding: 10px 0px 10px 0px;
+    width: 60px;
+    border-radius: 10px;
+    background: #101013;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.maps{
+    width: 50px;
+    height: 50px;
+    margin: 0px 0px 10px 0px;
+    font-size: 25;
+    font-weight: bold;
+    border: none;
+    outline: none;
+    border-radius: 10px;
+    background: #070708dc;
+    color: #c2c2c2;
+    
+    box-shadow:0px -2px 0 #05ac05 inset;
+    transition:all 0.3s;
+}
+.maps:hover{
+    width: 55px;
+    height: 55px;
+    cursor: pointer;
+}
+
+.maps[disabled] {
+    width: 50px;
+    height: 50px;
+    color: #666666;
+    background: #070708dc;
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
 .game-header {
