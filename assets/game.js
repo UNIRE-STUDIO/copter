@@ -173,7 +173,7 @@ var copter = {
     isActive: false,
     gravity: 120,           // Гравитация
     time: 0,                // Копим время полета и сбрасываем при прыжке
-    jumpForce: 10,          // Сила прыжка
+    jumpForce: 90,          // Сила прыжка
     currentJumpForce: 0,    // Текущая сила прыжка
     dampingJumpForce: 0.4,  // Демпфирование силы прыжка
 
@@ -243,7 +243,7 @@ var mapManager = {
     currentMapId: 0,
     currentMap: [],
     finish: 0,            // Финишная черта уровня
-    OffsetFromTheEnd: 90, // Отступ от конца карты пересекая который мы завершаем уровень (измеряется в блоках)
+    OffsetFromTheEnd: 10, // Отступ от конца карты пересекая который мы завершаем уровень (измеряется в блоках)
     maps: [],
 
     turnOnMove(){
