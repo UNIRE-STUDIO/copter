@@ -188,32 +188,23 @@ var copter = {
         // Проверка на столкновения
         let centerX = copter.x + (copter.width/2);
         let centerY = copter.y + (copter.height/2);
+
+        if (copter.y < 0 || copter.y + copter.height > canvas.height) game.gameOver();
         
         // Берем несколько блоков слева и справа от коптера и проверяем столкновения с блоками
         // в этой области
         let leftLimit = Math.floor((Math.abs(mapManager.x)+centerX)/config.grid)-1;
         let rightLimit = leftLimit + 3; //
-        
-        if (rightLimit >= mapManager.currentMap.length) rightLimit = mapManager.currentMap.length;
+        if (rightLimit >= mapManager.currentMapLength) rightLimit = mapManager.currentMapLength;
         for (let i = leftLimit; i < rightLimit; i++) {
-            for (let j = 0; j < mapManager.currentMap[i].length; j++) {
-                let block = mapManager.currentMap[i][j];
-                
+            if (!mapManager.currentMap.has(i)) continue;
+            for (let j = 0; j < mapManager.currentMap.get(i).length; j++) {
+                let block = mapManager.currentMap.get(i)[j];
                 // Проверяем пересечение квадратов
                 let collision = detectCollision({x:copter.x, y:copter.y, side:copter.width}, 
                                                 {x:block.x*config.grid+mapManager.x, y:block.y*config.grid, side:config.grid});
 
                 if (collision) game.gameOver();
-                /* Вычисление радиусом
-                let blockCenterX = (block.x * config.grid) + mapManager.x + (config.grid/2);
-                let blockCenterY = (block.y * config.grid) + (config.grid/2);
-                
-
-                let distance = Math.sqrt(Math.pow(blockCenterX-centerX, 2)+Math.pow(blockCenterY-centerY, 2));
-                if (distance < 50){
-                    console.log("DESTROY");
-                }
-                */
             }
         }
         copter.checkEndLevel();
@@ -241,6 +232,7 @@ var mapManager = {
     speed: 55,
     currentSpeed: 0,
     currentMapId: 0,
+    currentMapLength: 0,
     currentMap: [],
     finish: 0,            // Финишная черта уровня
     OffsetFromTheEnd: 10, // Отступ от конца карты пересекая который мы завершаем уровень (измеряется в блоках)
@@ -272,8 +264,8 @@ var mapManager = {
 
     parseJsonToMap(json){
         json.forEach(map => {
-            var columnNum = 0;              // Счетчик стобцов
-            var columns = [];
+            var columnNum = map[0].x;       // Счетчик стобцов
+            var columns = new Map();
             var blocks = [];
 
             // Перебираем блоки на карте
@@ -282,13 +274,14 @@ var mapManager = {
                     blocks.push(block);     // Так мы собираем все блоки расположенные в одном столбце
                 }
                 else {                      // Если предыдущий столбец закончился, переходим к следующему 
-                    columnNum++;            // Даём понять, что-мы готовы считать следующий столбец
-                    columns.push(blocks);   // Все собранные блоки добавляем в массив столбцов
+                                               // Даём понять, что-мы готовы считать следующий столбец
+                    columns.set(columnNum,blocks);// Все собранные блоки добавляем в массив столбцов
+                    columnNum = block.x;
                     blocks = [];            // обнуляем сборщик блоков
                     blocks.push(block);     // Добавляем блок нового столбца
                 }
             });
-            columns.push(blocks);           // (Для последнего столбца)
+            columns.set(blocks[0].x, blocks);           // (Для последнего столбца)
             var modifiedMap = columns;      // Пересобрали карту стобцами
             mapManager.maps.push(modifiedMap); // Добавляем собранную карту в массив карт
         });
@@ -297,7 +290,9 @@ var mapManager = {
 
     loadCurrentMap(){
         mapManager.currentMap = mapManager.maps[mapManager.currentMapId];
-        mapManager.finish = (mapManager.currentMap.length - mapManager.OffsetFromTheEnd) * config.grid;
+        let array = Array.from(mapManager.currentMap.values());
+        mapManager.currentMapLength = array[array.length-1][0].x;
+        mapManager.finish = (mapManager.currentMapLength - mapManager.OffsetFromTheEnd) * config.grid;
         mapManager.updateButtonsMap();
     },
 
@@ -327,23 +322,31 @@ var mapManager = {
     },
 
     draw(){
+        if (mapManager.currentMap.length === 0) return; // Надо сделать загрузку, так-как рисовка начинается раньше загрузки карты
         let leftLimit = Math.floor(Math.abs(mapManager.x/config.grid));
-        let sizeMapToGrid = Math.round(canvas.width/config.grid);
-        let rightLimit = sizeMapToGrid + leftLimit + 2;
-        if (rightLimit >= mapManager.currentMap.length) rightLimit = mapManager.currentMap.length;
+        let sizeMapToGrid = Math.round(canvas.width/config.grid);   // Количество блоков в кадре
+        let rightLimit = sizeMapToGrid + leftLimit + 2;             //
+        if (rightLimit >= mapManager.currentMapLength) rightLimit = mapManager.currentMapLength;
         for (let i = leftLimit; i < rightLimit; i++) {
-            for (let j = 0; j < mapManager.currentMap[i].length; j++) {
-                let block = mapManager.currentMap[i][j];
+            if (!mapManager.currentMap.has(i)) continue; // Если стобца нет, то переходим к следующему
+            for (let j = 0; j < mapManager.currentMap.get(i).length; j++) {
+                let block = mapManager.currentMap.get(i)[j];
                 let color;
                 switch (block.t) {
                     case "element1":
-                        color = "#1F618D";
+                        color = "#10454F";
                         break;
                     case "element2":
-                        color = "#B03A2E";
+                        color = "#506266";
+                        break;
+                    case "element3":
+                        color = "#818274";
+                        break;
+                    case "element4":
+                        color = "#A3AB78";
                         break;
                     default:
-                        color = "#B7950B";
+                        color = "#BDE038";
                         break;
                 }
                 drawRect(block.x * config.grid + mapManager.x, block.y * config.grid, config.grid, config.grid, color);

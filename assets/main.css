@@ -119,6 +119,8 @@ body{
 #myCanvas {
     display: block;
     border-radius: 5px;
+    border-bottom: 3px solid #101013;
+    border-top: 3px solid #101013;
 }
 
 .canvas-wrapper {
