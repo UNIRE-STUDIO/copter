@@ -171,16 +171,16 @@ var copter = {
     width: 40,
     height: 40,
     isActive: false,
-    gravity: 120,           // Гравитация
+    gravity: 190,           // Гравитация
     time: 0,                // Копим время полета и сбрасываем при прыжке
-    jumpForce: 90,          // Сила прыжка
+    jumpForce: 120,          // Сила прыжка
     currentJumpForce: 0,    // Текущая сила прыжка
     dampingJumpForce: 0.4,  // Демпфирование силы прыжка
 
     update() {
         if (!copter.isActive) return;
         copter.time += (glManager.lag/1000); // Получаем время между кадрами в миллесекундах (делим на 1000)
-        copter.y += ((copter.gravity * copter.time) - copter.currentJumpForce) * (glManager.lag/1000); // Ускорение свободного падения минус сила прыжка
+        copter.y += (((copter.gravity * copter.time) - copter.currentJumpForce)*(glManager.lag/1000)); // Ускорение свободного падения минус сила прыжка
     
         // Оставим это если надумаем смягчать силу прыжка
         //if (copter.currentJumpForce > 0) copter.currentJumpForce -= copter.dampingJumpForce;
@@ -369,25 +369,22 @@ var glManager = {
         glManager.elapsed = glManager.currentTime - glManager.pervious; // Время между предыдущим и текущим кадром
         glManager.pervious = glManager.currentTime;             // Сохраняем время текущего кадра
         glManager.lag += glManager.elapsed;                     // Суммированное время между кадрами
-        
-        if (glManager.lag < glManager.ms_per_update){           // Если процессор обработал быстрее чем нужно, то пропускаем вычисления
-            requestAnimFrame(glManager.gameLoop);
-            return;
-        }
 
         // Сохраняем лаг, т.е время с предыдущего РАБОЧЕГО кадра (для подсчета ФПС)
         // Так-как потом мы изменяем glManager.lag
         var curLag = glManager.lag;
-        
+
+        update();
+        glManager.lag -= glManager.elapsed;
+        /*
         // При накоплении лагов, змейка начнёт отставать на несколько итераций т.е перемещений
         // с помощью этого цикла мы нагоняем змейку к её нужному положению
+        */
         while (glManager.lag >= glManager.ms_per_update) {
             update();
             glManager.lag -= glManager.ms_per_update;
         }
-        // Рендерим кадр с нужны интервалом (glManager.ms_per_update)
         render();
-        
         // Ограничем показ ФПС
         if (Date.now() % 5 === 0) glManager.fpsUpdate(curLag);
 
