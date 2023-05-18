@@ -235,7 +235,7 @@ var mapManager = {
     currentMapLength: 0,
     currentMap: [],
     finish: 0,            // Финишная черта уровня
-    OffsetFromTheEnd: 10, // Отступ от конца карты пересекая который мы завершаем уровень (измеряется в блоках)
+    OffsetFromTheEnd: 10, // Отступ от конца карты, пересекая который мы завершаем уровень (измеряется в блоках)
     maps: [],
 
     turnOnMove(){
@@ -328,7 +328,7 @@ var mapManager = {
         let rightLimit = sizeMapToGrid + leftLimit + 2;             //
         if (rightLimit >= mapManager.currentMapLength) rightLimit = mapManager.currentMapLength;
         for (let i = leftLimit; i < rightLimit; i++) {
-            if (!mapManager.currentMap.has(i)) continue; // Если стобца нет, то переходим к следующему
+            if (!mapManager.currentMap.has(i)) continue;    // Если стобца нет, то переходим к следующему
             for (let j = 0; j < mapManager.currentMap.get(i).length; j++) {
                 let block = mapManager.currentMap.get(i)[j];
                 let color;
@@ -410,6 +410,13 @@ function render (){
     ctx.clearRect(0,0,canvas.width, canvas.height);
     copter.draw();
     mapManager.draw();
+    // Create gradient
+    var grd = ctx.createLinearGradient(canvas.width-config.grid*3,0,canvas.width,0);
+    grd.addColorStop(0,"#16161800");
+    grd.addColorStop(1,"#161618");
+    // Fill with gradient
+    ctx.fillStyle = grd;
+    ctx.fillRect(canvas.width-config.grid*3,0,config.grid*3,canvas.height);
 }
 
 // ВСПОМОГАТЕЛЬНЫЕ, УНИВЕРСАЛЬНЫЕ ФУНКЦИИ ................................................................
