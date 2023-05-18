@@ -238,7 +238,7 @@ var copter = {
 
 var mapManager = {
     x: 0,
-    speed: 45,
+    speed: 55,
     currentSpeed: 0,
     currentMapId: 0,
     currentMap: [],
