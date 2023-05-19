@@ -166,21 +166,21 @@ var config = {
 }
 
 var copter = {
-    x: 120,                  // Отступ от края должен быть кратен половину размера сетки (блока)
+    x: 120,                 // Отступ от края должен быть кратен половину размера сетки (блока) ??
     y: canvas.height/2,
     width: 40,
     height: 40,
-    isActive: false,
+    isActive: false,        // Активность. Если false отключаем update
     gravity: 190,           // Гравитация
     time: 0,                // Копим время полета и сбрасываем при прыжке
-    jumpForce: 120,          // Сила прыжка
+    jumpForce: 120,         // Сила прыжка
     currentJumpForce: 0,    // Текущая сила прыжка
     dampingJumpForce: 0.4,  // Демпфирование силы прыжка
 
     update() {
         if (!copter.isActive) return;
         copter.time += (glManager.lag/1000); // Получаем время между кадрами в миллесекундах (делим на 1000)
-        copter.y += (((copter.gravity * copter.time) - copter.currentJumpForce)*(glManager.lag/1000)); // Ускорение свободного падения минус сила прыжка
+        copter.y += (((copter.gravity * copter.time) - copter.currentJumpForce)*(glManager.lag/1000)); // Ускорение свободного падения минус сила прыжка на время между кадром
     
         // Оставим это если надумаем смягчать силу прыжка
         //if (copter.currentJumpForce > 0) copter.currentJumpForce -= copter.dampingJumpForce;
@@ -200,8 +200,8 @@ var copter = {
             if (!mapManager.currentMap.has(i)) continue;
             for (let j = 0; j < mapManager.currentMap.get(i).length; j++) {
                 let block = mapManager.currentMap.get(i)[j];
-                // Проверяем пересечение квадратов
-                let collision = detectCollision({x:copter.x, y:copter.y, side:copter.width}, 
+                
+                let collision = detectCollision({x:copter.x, y:copter.y, side:copter.width}, // Проверяем пересечение квадратов
                                                 {x:block.x*config.grid+mapManager.x, y:block.y*config.grid, side:config.grid});
 
                 if (collision) game.gameOver();
@@ -217,8 +217,7 @@ var copter = {
     },
 
     draw(){
-        // Рисуем квадрат
-        drawRect(copter.x, copter.y, copter.width, copter.height, "#67ED31")
+        drawRect(copter.x, copter.y, copter.width, copter.height, "#67ED31"); // Рисуем квадрат
     },
 
     jump(){
@@ -228,15 +227,15 @@ var copter = {
 }
 
 var mapManager = {
-    x: 0,
-    speed: 55,
-    currentSpeed: 0,
-    currentMapId: 0,
-    currentMapLength: 0,
-    currentMap: [],
+    x: 0,                 // Положение карты
+    speed: 65,            // 
+    currentSpeed: 0,      // Текущая скорость
+    currentMapId: 0,      // ID текущей карты
+    currentMapLength: 0,  // Полная длина текущей карты
+    currentMap: [],       // Текущая карта
     finish: 0,            // Финишная черта уровня
     OffsetFromTheEnd: 10, // Отступ от конца карты, пересекая который мы завершаем уровень (измеряется в блоках)
-    maps: [],
+    maps: [],             // Храним распарсенные карты
 
     turnOnMove(){
         mapManager.currentSpeed = mapManager.speed;
@@ -349,7 +348,8 @@ var mapManager = {
                         color = "#BDE038";
                         break;
                 }
-                drawRect(block.x * config.grid + mapManager.x, block.y * config.grid, config.grid, config.grid, color);
+                // + 1 к ширине, что-бы карта не полосила при движении
+                drawRect(block.x * config.grid + mapManager.x, block.y * config.grid, config.grid+1, config.grid, color);
             }
         }
     }
