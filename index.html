@@ -21,27 +21,27 @@
                 <div class="game-header">
                     <div class="hud">
                         <span id="fpsCounter">FPS: 0</span>
-                        <span id="recordCounter">Рекорд: 0</span>
                     </div>
                     <div><span id="scoreCounter">0</span></div>
                     <button id="pause" name="pause" type="button">||</button>
                 </div>
                 <div class="canvas-wrapper">
                     <canvas id="myCanvas" width="1500" height="480"></canvas>
-                    <button id="continue" name="continue" type="button">ПРОДОЛЖИТЬ</button>
-                    <div id="game-over">
+                    <button id="continue" name="continue" type="button" class="darkPanel">ПРОДОЛЖИТЬ</button>
+                    <div id="game-over" class="darkPanel">
                         <p id="you-lose">Вы проиграли</p>
                         <button id="restart" name="restart" type="button">РЕСТАРТ</button>
                     </div>
-                    <div id="finish-level">
+                    <div id="finish-level" class="darkPanel">
                         <p id="well-done">Уровень пройден!</p>
                         <button id="next-level" name="next-level" type="button">Следующий уровень</button>
                     </div>
-                    <p id="pressKeyToStart">Нажми пробел, что-бы начать</p>
+                    <div id="pressKeyToStart" class="darkPanel">
+                        <p>Нажми пробел, что-бы начать</p>
+                    </div>
                 </div>
                 <div class="footer">
-                    <!--<span id="current-level">Уровень: 1</span>-->
-                    <span id="version">версия: 0.0.0</span>
+                    <span id="version">версия: 0.0.1</span>
                 </div>
             </div>
         </div>

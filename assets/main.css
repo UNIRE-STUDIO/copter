@@ -92,14 +92,11 @@ body{
     font-size: 40px;
 }
 
-#recordCounter {
-    
-}
-
 #pause {
-    width: 55;
-    height: 35;
-    font-size: 16;
+    width: 50;
+    height: 50;
+    font-size: 22;
+    font-weight: bolder;
     border: none;
     outline: none;
     border-radius: 10px;
@@ -119,13 +116,11 @@ body{
 #myCanvas {
     display: block;
     border-radius: 5px;
-    border-bottom: 3px solid #101013;
-    border-top: 3px solid #101013;
+    border-bottom: 3px solid #818274;
+    border-top: 3px solid #818274;
 }
 
 .canvas-wrapper {
-    /*background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Ccircle cx='8' cy='8' r='1' fill='%23444444'/%3E%3C/svg%3E");
-    */
     position: relative;
 }
 
@@ -137,8 +132,6 @@ body{
     position: absolute;
     display: none;
 
-    border-radius: 15px;
-    background: #101013dc;
     border: none;
     color: #c2c2c2;
 
@@ -153,12 +146,8 @@ body{
     left: calc(50% - 150px);
     width: 300px;
     height: 100px;
-
     position: absolute;
     display: none;
-
-    border-radius: 15px;
-    background: #101013dc;
 }
 
 #you-lose{
@@ -205,8 +194,6 @@ body{
     width: 300px;
     height: 100px;
     position: absolute;
-    border-radius: 15px;
-    background: #101013dc;
 }
 
 #next-level{
@@ -233,11 +220,18 @@ body{
     color: #b4b4b4;
 }
 
-#current-level{
-    color: #f8f8f8;
-    
-}
-
 #version {
     font-size: 12px;
 }
+
+.darkPanel {
+    border-radius: 15px;
+    background: #101013dc;
+}
+
+/* Нажми на пробел */
+
+#pressKeyToStart {
+    padding: 0px 50px;
+}
+
