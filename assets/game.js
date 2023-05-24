@@ -150,7 +150,9 @@ var game = {
     },
     finishLevel(){
         // Если это не последняя карта 
-        if (mapManager.maps.length-1 > mapManager.currentMapId){
+        // и если пройденная карта ниже последней открытой
+        if (mapManager.maps.length-1 > mapManager.currentMapId
+            && localStorage.getItem('map') < mapManager.currentMapId){
             var saveMap = mapManager.currentMapId; // Открываем новую карту
             saveMap++;                             // 
             localStorage.setItem('map', saveMap);  // <--
@@ -290,7 +292,7 @@ var mapManager = {
     loadCurrentMap(){
         mapManager.currentMap = mapManager.maps[mapManager.currentMapId];
         let array = Array.from(mapManager.currentMap.values());
-        mapManager.currentMapLength = array[array.length-1][0].x;
+        mapManager.currentMapLength = array[array.length-1][0].x+1;
         mapManager.finish = (mapManager.currentMapLength - mapManager.OffsetFromTheEnd) * config.grid;
         mapManager.updateButtonsMap();
     },
