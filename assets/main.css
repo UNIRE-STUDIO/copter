@@ -2,6 +2,22 @@ body{
     margin: 0px;
     font-family: sans-serif;
 }
+
+button{
+    padding: 0;
+    width: 50px;
+    height: 50px;
+    font-weight: bold;
+    border: none;
+    outline: none;
+    border-radius: 10px;
+    background: #070708dc;
+    color: #c2c2c2;
+    -moz-user-select: none;    -o-user-select: none;    -khtml-user-select: none;    -webkit-user-select: none;    user-select: none;
+    box-shadow:0px -2px 0 #05ac05 inset;
+    transition:all 0.3s;
+}
+
 #page {
     background: #353336;
     width: 100vw;
@@ -21,10 +37,20 @@ body{
     display: flex;
 }
 
-#map-menu {
+#map-manager{
     margin-right: 20px;
     padding: 10px 0px 10px 0px;
     width: 60px;
+    border-radius: 10px;
+    background: #101013;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#map-menu {
+    padding: 10px 0px 10px 0px;
     border-radius: 10px;
     background: #101013;
 
@@ -62,6 +88,18 @@ body{
     background: #070708dc;
     cursor: not-allowed;
     box-shadow: none;
+}
+
+#custom-maps{
+    text-align: center;
+    line-height: 15px;
+    word-wrap: normal;
+    font-size: 9px;
+}
+
+#custom-maps:hover{
+    cursor: pointer;
+    box-shadow:0px -4px 0 #05ac05 inset;
 }
 
 .game-header {
@@ -140,6 +178,7 @@ body{
 }
 #continue:hover{
     box-shadow:0px -5px 0 #05ac05 inset;
+    cursor: pointer;
   }
 #game-over{
     top: 40%;
@@ -167,6 +206,32 @@ body{
     display: flex;
 }
 
+#open-mapeditor{
+    color: #c2c2c2;
+    top: 54%;
+    left: calc(50% - 130px);
+    position: absolute;
+    display: flex;
+    transition:all 0.3s;
+}
+#open-mapeditor a,
+#open-mapeditor a:active
+{
+    color: #c2c2c2;
+    text-decoration: none;
+    transition:all 0.3s;
+}
+#open-mapeditor a:hover
+{
+    color: #05ac05;
+    text-decoration: none;
+}
+#open-mapeditor:hover{
+    cursor: pointer;
+}
+
+
+
 #restart{
     width: 104px;
     height: 30px;
@@ -182,6 +247,7 @@ body{
 
 #restart:hover{
     box-shadow:0px -4px 0 #05ac05 inset;
+    cursor: pointer;
 }
 
 /* Уровень пройден!  ................................. */
@@ -233,5 +299,10 @@ body{
 
 #pressKeyToStart {
     padding: 0px 50px;
+    left: calc(50% - 230px);
+}
+
+#pressKeyToStart:hover {
+    cursor: pointer;
 }
 

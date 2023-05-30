@@ -53,6 +53,17 @@ for (let i = 0; i < mapsButtons.length; i++) {
     }
 }
 
+var customMap = document.getElementById("custom-maps");
+customMap.onclick = function () {
+    if (mapManager.currentMapId < 0) return;
+    if (localStorage.getItem("mapeditor") != null){
+        mapManager.loadCustomMap();
+        game.startGame();
+    }
+}
+
+var openMapEditor = document.getElementById("open-mapeditor");
+
 // ЗАГРУЗКА ДОКУМЕНТА ..........................................
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -69,6 +80,11 @@ document.addEventListener('DOMContentLoaded', function() {
 // ПОЛЬЗОВАТЕЛЬСКИЙ ВВОД ..........................................
 
 // Отлавливаев клики мышкой
+pressKeyToStart.addEventListener('click', function(evt) {
+    game.pressKeyToStart();
+    copter.jump();
+}, false);
+
 canvas.addEventListener('click', function(evt) {
     var mousePos = getMousePos(canvas, evt);
     /*
@@ -102,10 +118,11 @@ document.addEventListener('keydown', function() {
 var game = {
     score: 0,
     isPause: true,
+    isPlay: false,
     isReadyToStart: true,
     
     pauseIsActive(flag){
-        if (game.isReadyToStart) return;
+        if (!game.isPlay) return;
         this.isPause = flag;
         buttonContinue.style.display = flag ? "block" : "none";
         buttonPause.style.display = !flag ? "" : "none";
@@ -118,6 +135,13 @@ var game = {
         gameOverPanel.style.display = "none";
         finishLevel.style.display = "none";
         pressKeyToStart.style.display = "flex";
+        if (mapManager.currentMapId < 0){
+            openMapEditor.style.display = "flex";
+        }
+        else{
+            openMapEditor.style.display = "none";
+        }
+        
 
         mapManager.turnOffMove();
         copter.isActive = false;
@@ -128,6 +152,7 @@ var game = {
         copter.currentJumpForce = 0;
         copter.time = 0;
 
+        game.isPlay = false;
         game.isReadyToStart = true;
     },
 
@@ -138,14 +163,15 @@ var game = {
         mapManager.turnOnMove();
         buttonPause.style.display = "block";
         pressKeyToStart.style.display = "none";
+        game.isPlay = true;
     },
     addScore(){
         game.score++;
         scoreCounter.innerHTML = "" + game.score;
     },
     gameOver(){
+        game.isPlay = false; 
         buttonPause.style.display = "none";
-        game.isPause = true;
         gameOverPanel.style.display = "block";
     },
     finishLevel(){
@@ -157,7 +183,7 @@ var game = {
             saveMap++;                             // 
             localStorage.setItem('map', saveMap);  // <--
         } 
-        game.isPause = true;
+        game.isPlay = false;
         buttonPause.style.display = "none";
         finishLevel.style.display = "block";
     }
@@ -230,14 +256,21 @@ var copter = {
 
 var mapManager = {
     x: 0,                 // Положение карты
-    speed: 65,            // 
+    speed: 80,            // 
     currentSpeed: 0,      // Текущая скорость
     currentMapId: 0,      // ID текущей карты
     currentMapLength: 0,  // Полная длина текущей карты
     currentMap: [],       // Текущая карта
     finish: 0,            // Финишная черта уровня
-    OffsetFromTheEnd: 10, // Отступ от конца карты, пересекая который мы завершаем уровень (измеряется в блоках)
+    OffsetFromTheEnd: 40, // Отступ от конца карты, пересекая который мы завершаем уровень (измеряется в блоках)
     maps: [],             // Храним распарсенные карты
+    colorsBlock: {element1: "#10454F", 
+                  element2: "#506266",
+                  element3: "#818274",
+                  element4: "#A3AB78",
+                  element5: "#BDE038"
+                },
+    customMap: [],
 
     turnOnMove(){
         mapManager.currentSpeed = mapManager.speed;
@@ -250,20 +283,30 @@ var mapManager = {
     initialization(){
         if (localStorage.getItem('map') == null) localStorage.setItem('map', 0);
         mapManager.currentMapId = localStorage.getItem("map");
-        mapManager.loadJsonMaps();
+        mapManager.loadJsonDoc();
         mapManager.updateButtonsMap();
     },
 
-    loadJsonMaps(){
-        var url = 'assets/map.json';
+    loadJsonDoc(){
+        var url = 'assets/scene.json';
         fetch(url)
             .then(response => response.json())
             .then(json => {
-                mapManager.parseJsonToMap(json);
+                mapManager.initializationMaps(json);
             });
     },
 
-    parseJsonToMap(json){
+    initializationMaps(objMaps){
+        mapManager.maps = mapManager.parseObjectToMap(objMaps);
+        mapManager.loadCurrentMap();
+        if (localStorage.getItem("mapeditor") != null){
+            var objCustomMap = JSON.parse(localStorage.getItem("mapeditor"));
+            mapManager.customMap = mapManager.parseObjectToMap(objCustomMap)[0];
+        }
+    },
+
+    parseObjectToMap(json){
+        exportMaps = [];
         json.forEach(map => {
             var columnNum = map[0].x;       // Счетчик стобцов
             var columns = new Map();
@@ -284,18 +327,31 @@ var mapManager = {
             });
             columns.set(blocks[0].x, blocks);           // (Для последнего столбца)
             var modifiedMap = columns;      // Пересобрали карту стобцами
-            mapManager.maps.push(modifiedMap); // Добавляем собранную карту в массив карт
+            exportMaps.push(modifiedMap); // Добавляем собранную карту в массив карт
         });
-        mapManager.loadCurrentMap();
+        return exportMaps;
     },
 
     loadCurrentMap(){
         mapManager.currentMap = mapManager.maps[mapManager.currentMapId];
+
+        // Вычисляем конец карты
         let array = Array.from(mapManager.currentMap.values());
         mapManager.currentMapLength = array[array.length-1][0].x+1;
         mapManager.finish = (mapManager.currentMapLength - mapManager.OffsetFromTheEnd) * config.grid;
         mapManager.updateButtonsMap();
     },
+
+    loadCustomMap(){
+        mapManager.currentMapId = -1;
+        mapManager.currentMap = mapManager.customMap;
+
+        // Вычисляем конец карты
+        let array = Array.from(mapManager.currentMap.values());
+        mapManager.currentMapLength = array[array.length-1][0].x+1;
+        mapManager.finish = (mapManager.currentMapLength - mapManager.OffsetFromTheEnd) * config.grid;
+    },
+
 
     updateButtonsMap(){
         // Перебираем меню карт
@@ -332,24 +388,7 @@ var mapManager = {
             if (!mapManager.currentMap.has(i)) continue;    // Если стобца нет, то переходим к следующему
             for (let j = 0; j < mapManager.currentMap.get(i).length; j++) {
                 let block = mapManager.currentMap.get(i)[j];
-                let color;
-                switch (block.t) {
-                    case "element1":
-                        color = "#10454F";
-                        break;
-                    case "element2":
-                        color = "#506266";
-                        break;
-                    case "element3":
-                        color = "#818274";
-                        break;
-                    case "element4":
-                        color = "#A3AB78";
-                        break;
-                    default:
-                        color = "#BDE038";
-                        break;
-                }
+                let color = mapManager.colorsBlock[block.t];
                 // + 1 к ширине, что-бы карта не полосила при движении
                 drawRect(block.x * config.grid + mapManager.x, block.y * config.grid, config.grid+1, config.grid, color);
             }
@@ -403,7 +442,7 @@ var glManager = {
 }
 
 function update() {
-    if (game.isPause) return;
+    if (!game.isPlay || game.isPause) return;
     copter.update();
     mapManager.update();
 }
