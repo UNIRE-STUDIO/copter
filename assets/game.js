@@ -196,9 +196,9 @@ var game = {
     },
     finishLevel(){
         // Если это не последняя карта 
-        // и если пройденная карта ниже последней открытой
+        // и если последняя открытая карта равна пройденной
         if (mapManager.maps.length-1 > mapManager.currentMapId
-            && localStorage.getItem('map') < mapManager.currentMapId){
+            && localStorage.getItem('map') == mapManager.currentMapId){
             var saveMap = mapManager.currentMapId; // Открываем новую карту
             saveMap++;                             // 
             localStorage.setItem('map', saveMap);  // <--
@@ -240,12 +240,22 @@ var copter = {
     jumpForce: 120,         // Сила прыжка
     currentJumpForce: 0,    // Текущая сила прыжка
     dampingJumpForce: 0.4,  // Демпфирование силы прыжка
+    
+    lastSecondPos: {x:this.x, y:this.y},
+    timerTrail: 0,
 
     update() {
         if (!copter.isActive) return;
         copter.time += (glManager.lag/1000); // Получаем время между кадрами в миллесекундах (делим на 1000)
         copter.y += (((copter.gravity * copter.time) - copter.currentJumpForce)*(glManager.lag/1000)); // Ускорение свободного падения минус сила прыжка на время между кадром
-    
+        
+        /*
+        this.timerTrail -= (glManager.lag);
+        if (this.timerTrail <= 0){
+            this.timerTrail = 500;
+            this.lastSecondPos.y = this.y;
+        }
+        */
         // Оставим это если надумаем смягчать силу прыжка
         //if (copter.currentJumpForce > 0) copter.currentJumpForce -= copter.dampingJumpForce;
 
