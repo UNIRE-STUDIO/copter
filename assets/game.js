@@ -53,6 +53,7 @@ for (let i = 0; i < mapsButtons.length; i++) {
     }
 }
 
+// При нажатии на кнопку CUSTOM MAP
 var customMap = document.getElementById("custom-maps");
 customMap.onclick = function () {
     if (mapManager.currentMapId < 0) return;
@@ -60,9 +61,25 @@ customMap.onclick = function () {
         mapManager.loadCustomMap();
         game.startGame();
     }
+    else {
+        mapManager.loadCustomMap();
+        game.customMapMenu();
+    }
 }
 
-var openMapEditor = document.getElementById("open-mapeditor");
+var openMapEditorInstructions = document.getElementById("open-mapeditor-instructions");
+openMapEditorInstructions.addEventListener('click', function(evt) {
+    mapManager.currentMap = []; // Отключаем отрисовку карты
+    game.customMapMenu();
+}, false);
+
+var instructionsRulesToMapeditor = document.getElementById("instructions-rules-to-mapeditor");
+
+var continueCustomMapButton = document.getElementById("continue-custom-map");
+continueCustomMapButton.onclick = function () {
+    mapManager.loadCustomMap();
+    game.startGame();
+}
 
 // ЗАГРУЗКА ДОКУМЕНТА ..........................................
 document.addEventListener('DOMContentLoaded', function() {
@@ -136,11 +153,13 @@ var game = {
         finishLevel.style.display = "none";
         pressKeyToStart.style.display = "flex";
         if (mapManager.currentMapId < 0){
-            openMapEditor.style.display = "flex";
+            openMapEditorInstructions.style.display = "flex";
+            continueCustomMapButton.style.display = "block";
         }
         else{
-            openMapEditor.style.display = "none";
+            openMapEditorInstructions.style.display = "none";
         }
+        instructionsRulesToMapeditor.style.display = "none";
         
 
         mapManager.turnOffMove();
@@ -163,6 +182,7 @@ var game = {
         mapManager.turnOnMove();
         buttonPause.style.display = "block";
         pressKeyToStart.style.display = "none";
+        openMapEditorInstructions.style.display = "none";
         game.isPlay = true;
     },
     addScore(){
@@ -186,6 +206,22 @@ var game = {
         game.isPlay = false;
         buttonPause.style.display = "none";
         finishLevel.style.display = "block";
+    },
+    customMapMenu(){
+        game.isPlay = false;
+        game.isReadyToStart = false;
+        buttonPause.style.display = "none";
+        finishLevel.style.display = "none";
+        pressKeyToStart.style.display = "none";
+        gameOverPanel.style.display = "none";
+        instructionsRulesToMapeditor.style.display = "flex";
+        if (localStorage.getItem("mapeditor") == null){
+            continueCustomMapButton.style.display = "none";
+        }
+        else{
+            continueCustomMapButton.style.display = "block";
+        }
+        openMapEditorInstructions.style.display = "none";
     }
 }
 
@@ -264,7 +300,7 @@ var mapManager = {
     finish: 0,            // Финишная черта уровня
     OffsetFromTheEnd: 40, // Отступ от конца карты, пересекая который мы завершаем уровень (измеряется в блоках)
     maps: [],             // Храним распарсенные карты
-    colorsBlock: {element1: "#10454F", 
+    colorsBlock: {element1: "#10454F", // Цвета блоков
                   element2: "#506266",
                   element3: "#818274",
                   element4: "#A3AB78",
@@ -303,6 +339,7 @@ var mapManager = {
             var objCustomMap = JSON.parse(localStorage.getItem("mapeditor"));
             mapManager.customMap = mapManager.parseObjectToMap(objCustomMap)[0];
         }
+        
     },
 
     parseObjectToMap(json){
@@ -345,7 +382,7 @@ var mapManager = {
     loadCustomMap(){
         mapManager.currentMapId = -1;
         mapManager.currentMap = mapManager.customMap;
-
+        if (localStorage.getItem("mapeditor") == null) return;
         // Вычисляем конец карты
         let array = Array.from(mapManager.currentMap.values());
         mapManager.currentMapLength = array[array.length-1][0].x+1;

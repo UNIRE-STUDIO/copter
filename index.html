@@ -39,15 +39,47 @@
                         <p id="well-done">Уровень пройден!</p>
                         <button id="next-level" name="next-level" type="button">Следующий уровень</button>
                     </div>
-                    <div id="pressKeyToStart" class="darkPanel">
-                        <p>Нажми пробел, что-бы начать</p>
+                    <div id="pressKeyToStart">
+                        <p class="darkPanel">Нажми пробел, что-бы начать</p>
                     </div>
-                    <div id="open-mapeditor">
-                        <a href="https://unire-studio.github.io/map-editor/">-- Открыть редактор карт --</a>
+                    <div id="open-mapeditor-instructions">
+                        <a>-- Map Editor --</a>
+                    </div>
+                    <div id="instructions-rules-to-mapeditor">
+                        <div id="text-header">
+                            <p>У вас есть возможность создать собственную карту в нашем онлайн редакторе карт.</p>
+                            <p>Поскольку редактор карт универсален, вам потребуется соблюдать несколько простых</p>
+                            <p>требований для того, что-бы игра работала с вашей картой коррекно.</p>
+                        </div>
+                        <div id="instructions-rules">
+                            <div id="instructions" class="darkPanel enum">
+                                <p>Инструкция</p>
+                                <ul>
+                                    <li>Ознакомьтесь с требованиями</li>
+                                    <li>Перейдите на страницу редактора</li>
+                                    <li>Задайте размеры вашей карты, затем нарисуйте её</li>
+                                    <li>С цветами блоков пока всё плохо, их надо настраивать в ручную, либо вообще на них не полагаться</li>
+                                    <li>В редакторе реализовано сохранение карты в кэш, этот кэш для редактора и игры общий. После возвращения в игру созданная вами карта будет автоматически загружена</li>
+                                    <li>После того, как всё будет готово, воспользуйтесь специальной кнопкой перехода в игру, после чего </li>
+                                </ul>
+                            </div>
+                            <div id="rules" class="darkPanel enum">
+                                <p>Требования</p>
+                                <ul>
+                                    <li>Высота (Y) карты <b>10</b> блоков</li>
+                                    <li>Длина (X) карты не менее <b>80</b> блоков</li>
+                                    <li>Конец карты засчитывается игрой за <b>40</b> блоков до фактического конца карты</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="open-mapeditor-container">
+                            <a id="open-mapeditor-button" href="https://unire-studio.github.io/map-editor/?play=https://unire-studio.github.io/copter/">Перейти в редактор карт</a>
+                            <button id="continue-custom-map" name="continue" type="button">Продолжить игру</button>
+                        </div>
                     </div>
                 </div>
                 <div class="footer">
-                    <span id="version">версия: 0.0.1</span>
+                    <span id="version">версия: 0.0.3</span>
                 </div>
             </div>
         </div>
