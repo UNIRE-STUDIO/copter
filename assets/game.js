@@ -13,35 +13,36 @@ var ctx = canvas.getContext('2d');
 
 var fpsCounter = document.querySelector(".hud #fpsCounter");
 var scoreCounter = document.querySelector(".game-header div #scoreCounter");
-var recordCounter = document.querySelector(".game-header .hud #recordCounter");
 
 // Пауза
-var buttonPause = document.getElementById("pause"); 
-buttonPause.onclick = function() {
-    game.pauseIsActive(!game.isPause);
+var pauseButton = document.getElementById("pause-button"); 
+pauseButton.onclick = function() {
+    game.changeState(GameStates.PAUSE);
 }
-var buttonContinue = document.getElementById("continue");
-buttonContinue.onclick = function () {
-    game.pauseIsActive(false);
+var continueButton = document.getElementById("continue-button");
+continueButton.onclick = function () {
+    game.changeState(GameStates.PLAY);
 }
 
-var gameOverPanel = document.getElementById("game-over");
-var buttonRestart = document.getElementById("restart");
-buttonRestart.onclick = function () {
-    game.startGame();
+var gameOverPanel = document.getElementById("game-over-panel");
+var restartButton = document.getElementById("restart-button");
+restartButton.onclick = function () {
+    game.changeState(GameStates.READYTOPLAY);
 }
 
 var pressKeyToStart = document.getElementById("pressKeyToStart");
 var currentLevel = document.getElementById("current-level");
 
-var finishLevel = document.getElementById("finish-level");
-var nextLevel = document.getElementById("next-level");
+var finishLevel = document.getElementById("finish-level-panel");
+var nextLevel = document.getElementById("next-level-button");
 nextLevel.onclick = function () {
     // Если это не последняя карта 
     if (mapManager.maps.length-1 > mapManager.currentMapId) mapManager.currentMapId++ // То включаем следующую
     mapManager.loadCurrentMap();
-    game.startGame();
+    game.changeState(GameStates.READYTOPLAY);
 }
+
+var levelMenuPanel = document.getElementById("level-menu-panel");
 
 var mapsButtons = document.getElementsByClassName("maps");
 for (let i = 0; i < mapsButtons.length; i++) {
@@ -49,17 +50,15 @@ for (let i = 0; i < mapsButtons.length; i++) {
         if (i === mapManager.currentMapId) return;
         mapManager.currentMapId = i;
         mapManager.loadCurrentMap();
-        game.startGame();
     }
 }
 
 // При нажатии на кнопку CUSTOM MAP
-var customMap = document.getElementById("custom-maps");
-customMap.onclick = function () {
+document.getElementById("custom-maps-button").onclick = function () {
     if (mapManager.currentMapId < 0) return;
     if (localStorage.getItem("mapeditor") != null){
         mapManager.loadCustomMap();
-        game.startGame();
+        game.changeState(GameStates.READYTOPLAY);
     }
     else {
         mapManager.loadCustomMap();
@@ -75,7 +74,7 @@ openMapEditorInstructions.addEventListener('click', function(evt) {
 
 var instructionsRulesToMapeditor = document.getElementById("instructions-rules-to-mapeditor");
 
-var continueCustomMapButton = document.getElementById("continue-custom-map");
+var continueCustomMapButton = document.getElementById("continue-custom-map-button");
 continueCustomMapButton.onclick = function () {
     mapManager.loadCustomMap();
     game.startGame();
@@ -90,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
     canvas.width = window.innerWidth - 200;
     if (canvas.width < 600) canvas.width = 600;
     mapManager.initialization();
-    game.startGame();
+    game.changeState(GameStates.LEVEL_SELECTION);
     glManager.gameLoop();
 });
 
@@ -132,23 +131,50 @@ document.addEventListener('keydown', function() {
 
 // СУЩНОСТИ ....................................................................
 
+// Состояния в которых игра может находиться
+const GameStates = {LEVEL_SELECTION: 0, READYTOPLAY: 1, PLAY: 2, PAUSE: 3, GAMEOVER: 4, WIN: 5}
+
 var game = {
     score: 0,
-    isPause: true,
-    isPlay: false,
-    isReadyToStart: true,
-    
-    pauseIsActive(flag){
-        if (!game.isPlay) return;
-        this.isPause = flag;
-        buttonContinue.style.display = flag ? "block" : "none";
-        buttonPause.style.display = !flag ? "" : "none";
+    currentState: GameStates.LEVEL_SELECTION,
+
+    changeState(state){
+        switch (state) {
+            case GameStates.LEVEL_SELECTION:
+                game._LevelSelection();    
+            break;
+            case GameStates.READYTOPLAY:
+                    // Костыль, который не позволяет одновременно срабатывать методу Click и Нажатию на кнопку рестарт или выбор уровня
+                    setTimeout(game._ReadyToPlay, 20);
+            break;
+            case GameStates.PLAY:
+                if (game.currentState != GameStates.READYTOPLAY) return;
+                game._Play();
+            break;
+            case GameStates.PAUSE:
+                game._Pause();
+            break;
+            case GameStates.GAMEOVER:
+                game._Gameover();
+            break;
+            case GameStates.WIN:
+                game._Win();
+            break;
+            default:
+                break;
+        }
     },
-    startGame(){
+
+    // Режимы игры ...............................................
+    _LevelSelection(){
+        levelMenuPanel.style.display = "block";
+        game.currentState = GameStates.LEVEL_SELECTION;
+    },
+    _ReadyToPlay(){
         this.isPause = false;
         this.score = 0;
         scoreCounter.innerHTML = "" + game.score;
-        buttonPause.style.display = "none";
+        pauseButton.style.display = "none";
         gameOverPanel.style.display = "none";
         finishLevel.style.display = "none";
         pressKeyToStart.style.display = "flex";
@@ -161,7 +187,6 @@ var game = {
         }
         instructionsRulesToMapeditor.style.display = "none";
         
-
         mapManager.turnOffMove();
         copter.isActive = false;
 
@@ -171,30 +196,36 @@ var game = {
         copter.currentJumpForce = 0;
         copter.time = 0;
 
-        game.isPlay = false;
-        game.isReadyToStart = true;
+        game.currentState = GameStates.READYTOPLAY;
     },
-
-    pressKeyToStart(){
-        if (!game.isReadyToStart) return;
-        game.isReadyToStart = false;
+    _Play(){
         copter.isActive = true;
         mapManager.turnOnMove();
-        buttonPause.style.display = "block";
+        pauseButton.style.display = "block";
         pressKeyToStart.style.display = "none";
         openMapEditorInstructions.style.display = "none";
-        game.isPlay = true;
+        game.currentState = GameStates.PLAY;
     },
-    addScore(){
-        game.score++;
-        scoreCounter.innerHTML = "" + game.score;
+    _Pause(){
+        if (game.currentState == GameStates.PAUSE) { // Если мы кликаем на паузу, когда игра уже в режиме паузы
+            game._Play();
+            return;
+        }
+        if (game.currentState != GameStates.PLAY) return;
+        
+        continueButton.style.display = "block";
+        pauseButton.style.display = "none";
+
+        game.currentState = GameStates.PAUSE;
     },
-    gameOver(){
-        game.isPlay = false; 
-        buttonPause.style.display = "none";
+    _Gameover(){
+        
+        pauseButton.style.display = "none";
         gameOverPanel.style.display = "block";
+        game.currentState = GameStates.GAMEOVER;
     },
-    finishLevel(){
+    _Win()
+    {
         // Если это не последняя карта 
         // и если последняя открытая карта равна пройденной
         if (mapManager.maps.length-1 > mapManager.currentMapId
@@ -204,13 +235,25 @@ var game = {
             localStorage.setItem('map', saveMap);  // <--
         } 
         game.isPlay = false;
-        buttonPause.style.display = "none";
+        pauseButton.style.display = "none";
         finishLevel.style.display = "block";
+        game.currentState = GameStates.WIN;
+    },
+    //................................................................
+
+    loadGame(level){
+        if (levelManager.levels.length-1 < level) return; // Если уровня нет, то ничего не делаем
+        game.changeState(GameStates.READYTOPLAY);
+        levelManager.loadMap(level);
+    },
+    addScore(){
+        game.score++;
+        scoreCounter.innerHTML = "" + game.score;
     },
     customMapMenu(){
         game.isPlay = false;
         game.isReadyToStart = false;
-        buttonPause.style.display = "none";
+        pauseButton.style.display = "none";
         finishLevel.style.display = "none";
         pressKeyToStart.style.display = "none";
         gameOverPanel.style.display = "none";
@@ -506,83 +549,3 @@ function render (){
     ctx.fillStyle = grd;
     ctx.fillRect(canvas.width-config.grid*3,0,config.grid*3,canvas.height);
 }
-
-// ВСПОМОГАТЕЛЬНЫЕ, УНИВЕРСАЛЬНЫЕ ФУНКЦИИ ................................................................
-
-var requestAnimFrame = (function(){
-    return  window.requestAnimationFrame        ||
-            window.webkitRequestAnimationFrame  ||
-            window.mozRequestAnimationFrame     ||
-            window.oRequestAnimationFrame       ||
-            window.msRequestAnimationFrame      ||
-            function(callback){
-                window.setTimeout(callback, 1000 / 20);
-            };
-})();
-
-// Получаем рандомное целое число в диапазоне
-function randomRange(min, max){
-    return Math.floor(Math.random() * (max - min)) + min;
-}
-
-// Функция проверяет попадает ли точка в область прямоугольника
-function isInside(pos, rect){
-    return pos.x > rect.x && pos.x < rect.x+rect.width && pos.y < rect.y+rect.height && pos.y > rect.y
-}
-
-// Рисуем квадрат
-function drawRect(posX, posY, scaleX, scaleY, color){
-    ctx.beginPath();
-    ctx.fillStyle = color;
-    ctx.fillRect(posX, posY, scaleX, scaleY);
-    ctx.fill();
-}
-
-// Рисуем текст в канвасе
-function drawText(text){
-    ctx.font = '10pt arial';
-    ctx.fillStyle = '#000000'
-    ctx.fillText('label: ' + text, 13, 50);
-}
-
-// Получаем позицию мыши
-function getMousePos(canvas, event) {
-    var rect = canvas.getBoundingClientRect();
-    return {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top
-    };
-}
-
-var drawDebbug = {
-    drawObject: {posX: 0, posY: 0, scaleX: 0, scaleY: 0, color: "ffffff"},
-    text: '',
-    draw(){
-        drawRect(drawDebbug.drawObject.posX, 
-            drawDebbug.drawObject.posY, 
-            drawDebbug.drawObject.scaleX, 
-            drawDebbug.drawObject.scaleY, 
-            drawDebbug.drawObject.color);
-        drawText(drawDebbug.text);
-    }
-}
-
-function detectCollision(sq1, sq2) {
-
-    // вычисляем границы квадратов
-    const sq1_left = sq1.x;
-    const sq1_right = sq1.x + sq1.side;
-    const sq1_top = sq1.y;
-    const sq1_bottom = sq1.y + sq1.side;
-    
-    const sq2_left = sq2.x;
-    const sq2_right = sq2.x + sq2.side;
-    const sq2_top = sq2.y;
-    const sq2_bottom = sq2.y + sq2.side;
-    
-    // проверяем, пересекаются ли границы квадратов по осям X и Y
-    const x_collide = sq1_right >= sq2_left && sq1_left <= sq2_right;
-    const y_collide = sq1_bottom >= sq2_top && sq1_top <= sq2_bottom;
-    
-    return x_collide && y_collide;
-  }
