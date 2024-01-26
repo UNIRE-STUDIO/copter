@@ -12,12 +12,11 @@
 }
 
 .button {
-    font-family: sans-serif;
     border-radius: 15px;
     background: #101013dc;
     border: none;
     color: #c2c2c2;
-    padding: 15px 30px;
+    padding: 15px 25px;
 
     font-size: min(max(1.5vw, 1.8vw), 1.5vw);
 
@@ -63,9 +62,65 @@ body{
     background-color: #161618;
     box-shadow: 0px -1px 0 #05ac05 inset, 0px 0px 40px 10px #161618;
     border-radius: 9px;
-
-    display: flex;
 }
+
+/*       GAME HEADER         */
+
+.game-header {
+    padding-top: 1vmin;
+    padding-bottom: 1vmin;
+
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns : auto auto auto;
+    align-items: center;
+    justify-content: space-between;
+    color: #ffffff;
+
+    -moz-user-select: none;    -o-user-select: none;    -khtml-user-select: none;    -webkit-user-select: none;    user-select: none;
+}
+
+/* ----- */
+
+#fpsCounter {
+    color: #e3ed04;
+    font-size:8pt;
+    
+    grid-column: 1;
+    grid-row: 1;
+}
+
+#scoreCounter {
+    font-size: 40px;
+    justify-self: center;
+    grid-column: 1 / 4;
+    grid-row: 1;
+}
+
+#pause-button {
+    font-size: 22;
+    font-weight: bolder;
+    border-radius: 10px;
+    grid-column: 3;
+    grid-row: 1;
+}
+
+/* --------------------------------- */
+
+/*       CANVAS WRAPPER         */
+
+.canvas-wrapper {
+    position: relative;
+}
+
+#myCanvas {
+    display: block;
+    border-radius: 5px;
+    border-bottom: 3px solid #818274;
+    border-top: 3px solid #818274;
+}
+
+/*  UI-IN-CANVAS  */
 
 .ui-in-canvas{
     width: 70%;
@@ -86,156 +141,29 @@ body{
     align-items: stretch;
 }
 
-#map-manager{
-    margin-right: 20px;
-    padding: 10px 0px 10px 0px;
-    width: 60px;
-    border-radius: 10px;
-    background: #101013;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
+/* level-menu-panel */
+
+#list-levels{
+    display: grid;
+    grid-auto-flow: row;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 10px;
 }
 
-#map-menu {
-    padding: 10px 0px 10px 0px;
-    border-radius: 10px;
-    background: #101013;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
+.level-buttoms {
+    padding: 25px 0px;
+    font-size: 15px;
 }
 
-.maps{
-    width: 50px;
-    height: 50px;
-    margin: 0px 0px 10px 0px;
-    font-size: 25;
-    font-weight: bold;
-}
-.maps:hover{
-    width: 55px;
-    height: 55px;
-}
-
-.maps[disabled] {
-    width: 50px;
-    height: 50px;
+.level-buttons[disabled] {
     color: #666666;
     background: #070708dc;
     cursor: not-allowed;
     box-shadow: none;
 }
 
-#custom-maps{
-    text-align: center;
-    line-height: 15px;
-    word-wrap: normal;
-    font-size: 9px;
-    width: 50px;
-    height: 50px;
-}
-
-#custom-maps:hover{
-    cursor: pointer;
-    width: 55px;
-    height: 55px;
-}
-
-.game-header {
-    padding-top: 1vmin;
-    padding-bottom: 1vmin;
-
-    display: flex;
-    justify-content: space-between;
-    color: #ffffff;
-    height: 50;
-}
-
-.hud {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-#fpsCounter {
-    color: #e3ed04;
-    font-size:8pt;
-    -moz-user-select: none;    -o-user-select: none;    -khtml-user-select: none;    -webkit-user-select: none;    user-select: none;
-}
-
-#scoreCounter {
-    left: 50%;
-    position: absolute;
-    font-size: 40px;
-}
-
-#pause {
-    width: 50;
-    height: 50;
-    font-size: 22;
-    font-weight: bolder;
-    border: none;
-    outline: none;
-    border-radius: 10px;
-    background: #101013;
-    color: #c2c2c2;
-    -moz-user-select: none;    -o-user-select: none;    -khtml-user-select: none;    -webkit-user-select: none;    user-select: none;
-
-    box-shadow:0px -2px 0 #05ac05 inset;
-    transition:all 0.3s;
-}
-
-#pause:hover {
-    box-shadow:0px -4px 0 #05ac05 inset;
-    cursor: pointer;
-}
-
-#myCanvas {
-    display: block;
-    border-radius: 5px;
-    border-bottom: 3px solid #818274;
-    border-top: 3px solid #818274;
-}
-
-.canvas-wrapper {
-    position: relative;
-}
-
-#continue {
-    top: 40%;
-    left: calc(50% - 100px);
-    width: 200px;
-    height: 46px;
-    position: absolute;
-    display: none;
-
-    border: none;
-    color: #c2c2c2;
-
-    box-shadow:0px -2px 0 #05ac05 inset;
-    transition:all 0.3s;
-}
-#continue:hover{
-    box-shadow:0px -5px 0 #05ac05 inset;
-    cursor: pointer;
-  }
-#game-over{
-    top: 40%;
-    left: calc(50% - 150px);
-    width: 300px;
-    height: 100px;
-    position: absolute;
-    display: none;
-}
-
-#you-lose{
-    color: #c2c2c2;
-    text-align: center;
-}
+/* ---------- */
 
 #open-mapeditor-instructions{
     color: #c2c2c2;
@@ -259,20 +187,6 @@ body{
 }
 #open-mapeditor-instructions:hover{
     cursor: pointer;
-}
-
-
-.footer {
-    margin-top: 5px;
-    font-size: 12px;
-    display: flex;
-    justify-content: space-between;
-    color: #b4b4b4;
-}
-
-.darkPanel {
-    border-radius: 15px;
-    background: #101013dc;
 }
 
 /* Нажми на пробел */
@@ -363,34 +277,15 @@ body{
     justify-self: center;
 }
 
-#open-mapeditor-button{
-    width: 200px;
-    font-weight: bold;
-    border-radius: 10px;
-    background: #070708;
-    color: #c2c2c2;
-    box-shadow:0px -2px 0 #05ac05 inset;
-    padding: 15px 20px;
-    border-radius: 12px;
-    text-decoration: none;
-    transition:all 0.3s;
-}
-#open-mapeditor-button:hover{
-    box-shadow:0px -5px 0 #05ac05 inset;
-    padding: 15px 30px;
-    cursor: pointer;
+
+/*       FOOTER         */
+
+.footer {
+    margin-top: 5px;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    color: #b4b4b4;
 }
 
-#continue-custom-map{
-    width: 240px;
-    font-size: 16px;
-    padding: 15px 20px;
-    margin-left: 30px;
-    display: none;
-}
-
-#continue-custom-map:hover{
-    box-shadow:0px -5px 0 #05ac05 inset;
-    width: 260px;
-    cursor: pointer;
-}
+/* --------------------------------- */
