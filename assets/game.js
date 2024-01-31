@@ -179,7 +179,6 @@ var game = {
         game.copter.isActive = false;
 
         levelManager.x = 0;               // Вынести в функции объекта
-        game.copter.x = 120,
         game.copter.y = canvas.height/4;
         game.copter.currentJumpForce = 0;
         game.copter.time = 0;
@@ -352,7 +351,12 @@ function copter() {
 
     this.updateFields = function()
     {
-        
+        this.x = config.grid * 2.5;           
+        this.y = canvas.height/2;
+        this.width = config.grid * 0.83;
+        this.height = config.grid * 0.83;
+        this.gravity = config.grid * 3.96;
+        this.jumpForce = config.grid * 2.5;
     },
 
     this.render = function(){
@@ -367,7 +371,7 @@ function copter() {
 
 var levelManager = {
     x: 0,                 // Положение карты
-    speed: config.grid * 1.0,            // 
+    speed: config.grid * 1.7,            // 
     currentSpeed: 0,      // Текущая скорость
     currentLevelId: 0,      // ID текущей карты
     currentLevelLength: 0,  // Полная длина текущей карты
@@ -506,7 +510,7 @@ var levelManager = {
     },
 
     updateFields(){
-
+        levelManager.speed = config.grid * 1.7;
     }
 }
 
