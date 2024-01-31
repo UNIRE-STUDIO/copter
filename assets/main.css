@@ -6,6 +6,7 @@
     text-align: center;
 
     display: none;
+    justify-content: center;
 
     border-radius: 15px;
     background: #10101391;
@@ -98,11 +99,12 @@ body{
 }
 
 #pause-button {
-    font-size: 22;
+    font-size: 15px;
     font-weight: bolder;
     border-radius: 10px;
     grid-column: 3;
     grid-row: 1;
+    display: none;
 }
 
 /* --------------------------------- */
