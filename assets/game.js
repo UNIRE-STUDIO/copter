@@ -15,50 +15,54 @@ var fpsCounter = document.getElementById("fpsCounter");
 
 // Пауза
 var pauseButton = document.getElementById("pause-button"); 
-pauseButton.onclick = function() {
+document.getElementById("pause-button").onclick = function() {
     game.changeState(GameStates.PAUSE);
 }
-var continueButton = document.getElementById("continue-button");
-continueButton.onclick = function () {
-    game.changeState(GameStates.PLAY);
+var pausePanel = document.getElementById("pause-panel");
+document.getElementById("continue-button").onclick = function () {
+    game.changeState(GameStates.PAUSE);
+}
+
+var menuButtons = document.getElementsByClassName("menu-button");
+for (let i = 0; i < menuButtons.length; i++) {
+    menuButtons[i].onclick = function () {
+        game.changeState(GameStates.LEVEL_SELECTION);
+    }
 }
 
 var gameOverPanel = document.getElementById("game-over-panel");
-var restartButton = document.getElementById("restart-button");
-restartButton.onclick = function () {
+document.getElementById("restart-button").onclick = function () {
     game.changeState(GameStates.READYTOPLAY);
 }
+
+var levelCounter = document.getElementById("level-counter");
 
 var pressKeyToStart = document.getElementById("pressKeyToStart");
 
 var finishLevel = document.getElementById("finish-level-panel");
-var nextLevel = document.getElementById("next-level-button");
-nextLevel.onclick = function () {
-    // Если это не последняя карта 
-    if (levelManager.levels.length-1 > levelManager.currentLevelId) levelManager.currentLevelId++ // То включаем следующую
-    levelManager.loadCurrentMap();
-    game.changeState(GameStates.READYTOPLAY);
+document.getElementById("next-level-button").onclick = function () 
+{
+    game.loadGame(levelManager.currentLevelId+1);
 }
 
 var levelMenuPanel = document.getElementById("level-menu-panel");
 
-var levelButtoms = document.getElementsByClassName("level-buttoms");
-for (let i = 0; i < levelButtoms.length; i++) {
-    levelButtoms[i].onclick = function () {
+var levelbuttons = document.getElementsByClassName("level-buttons");
+for (let i = 0; i < levelbuttons.length; i++) {
+    levelbuttons[i].onclick = function () {
         game.loadGame(i);
     }
 }
 
 // При нажатии на кнопку CUSTOM MAP
-document.getElementById("custom-maps-button").onclick = function () {
-    if (levelManager.currentLevelId < 0) return;
-    if (localStorage.getItem("mapeditor") != null){
-        levelManager.loadCustomMap();
-        game.changeState(GameStates.READYTOPLAY);
+document.getElementById("custom-map-button").onclick = function () {
+    if (localStorage.getItem("mapeditor") != null)
+    {
+        game.loadGame(-1);
     }
-    else {
-        levelManager.loadCustomMap();
-        game.customMapMenu();
+    else 
+    {
+        
     }
 }
 
@@ -72,8 +76,7 @@ var instructionsRulesToMapeditor = document.getElementById("instructions-rules-t
 
 var continueCustomMapButton = document.getElementById("continue-custom-map-button");
 continueCustomMapButton.onclick = function () {
-    //levelManager.loadCustomMap();   <-----------------------
-    //game.startGame();
+    game.changeState(GameStates.PLAY);
 }
 
 // ЗАГРУЗКА ДОКУМЕНТА ..........................................
@@ -123,6 +126,11 @@ document.addEventListener('keydown', function() {
     }
 });
 
+window.addEventListener('resize', function() {
+    if (game.currentState == GameStates.PLAY) game.changeState(GameStates.PAUSE);
+    config.resizeGame();
+}, true);
+
 // СУЩНОСТИ ....................................................................
 
 // Состояния в которых игра может находиться
@@ -163,10 +171,15 @@ var game = {
     // Режимы игры ...............................................
     _LevelSelection(){
         levelMenuPanel.style.display = "block";
+        pauseButton.style.display = "none";
+        pausePanel.style.display = "none";
+        finishLevel.style.display = "none";
+        gameOverPanel.style.display = "none";
+        game.copter = null;
+        clearCanvas();
         game.currentState = GameStates.LEVEL_SELECTION;
     },
     _ReadyToPlay(){
-        scoreCounter.innerHTML = "" + game.score;
         pauseButton.style.display = "none";
         gameOverPanel.style.display = "none";
         finishLevel.style.display = "none";
@@ -189,10 +202,10 @@ var game = {
         game.copter.isActive = true;
         levelManager.turnOnMove();
         pauseButton.style.display = "block";
+        pausePanel.style.display = "none";
         pressKeyToStart.style.display = "none";
         openMapEditorInstructions.style.display = "none";
         game.currentState = GameStates.PLAY;
-        game.copter.jump();
     },
     _Pause(){
         if (game.currentState == GameStates.PAUSE) { // Если мы кликаем на паузу, когда игра уже в режиме паузы
@@ -201,7 +214,7 @@ var game = {
         }
         if (game.currentState != GameStates.PLAY) return;
         
-        continueButton.style.display = "block";
+        pausePanel.style.display = "block";
         pauseButton.style.display = "none";
 
         game.currentState = GameStates.PAUSE;
@@ -230,31 +243,22 @@ var game = {
     //................................................................
 
     loadGame(level){
+        if (level == -1) 
+        {
+            game.changeState(GameStates.READYTOPLAY);
+            levelManager.currentLevelId = level;
+            levelManager.loadCustomMap();
+            levelCounter.innerHTML = "Пользовательский уровень";
+        }
         if (levelManager.levels.length-1 < level) return; // Если уровня нет, то ничего не делаем
         game.changeState(GameStates.READYTOPLAY);
         levelManager.currentLevelId = level;
         levelManager.loadCurrentMap();
+        levelCounter.innerHTML = "Уровень: " + (level+1);
     },
     addScore(){
         game.score++;
-        scoreCounter.innerHTML = "" + game.score;
     },
-    customMapMenu(){
-        game.isPlay = false;
-        game.isReadyToStart = false;
-        pauseButton.style.display = "none";
-        finishLevel.style.display = "none";
-        pressKeyToStart.style.display = "none";
-        gameOverPanel.style.display = "none";
-        instructionsRulesToMapeditor.style.display = "flex";
-        if (localStorage.getItem("mapeditor") == null){
-            continueCustomMapButton.style.display = "none";
-        }
-        else{
-            continueCustomMapButton.style.display = "block";
-        }
-        openMapEditorInstructions.style.display = "none";
-    }
 }
 
 var config = {
@@ -267,16 +271,23 @@ var config = {
     },
 
     resizeGame(){
-        canvas.height = window.innerHeight * 0.76;
-        canvas.width = window.innerWidth * 0.9;
+        var newHeight = window.innerHeight * 0.76;
+        var newWidth = window.innerWidth * 0.9;
 
-        // Стараемся сохранить относительное положение шариков
-        //    for (let i = 0; i < game.balls.length; i++) {
-        //        var relativePosX = game.balls[i].position.x / canvas.width;
-        //        var relativePosY = game.balls[i].position.y / canvas.height;
-        //        game.balls[i].updatePos({x: relativePosX * newWidth, y: relativePosY * newHeight});
-        //    }
-        //
+        if (game.currentState != GameStates.LEVEL_SELECTION)
+        {
+            // Стараемся сохранить относительное положение коптера
+            var relativePosX = game.copter.x / canvas.width * newWidth;
+            var relativePosY = game.copter.y / canvas.height * newHeight;
+            game.copter.x = relativePosX;
+            game.copter.y = relativePosY;
+
+            relativePosX = levelManager.x / canvas.height * newHeight;
+            levelManager.x = relativePosX;
+        }
+
+        canvas.width = newWidth;
+        canvas.height = newHeight;
         
         config.h = canvas.height / 100;
         config.w = canvas.width / 100;
@@ -290,7 +301,7 @@ var config = {
 
 function copter() {
     this.x = config.grid * 2.5,                 // Отступ от края должен быть кратен половину размера сетки (блока) ??
-    this.y = canvas.height/2,
+    this.y = canvas.height / 2,
     this.width = config.grid * 0.83,
     this.height = config.grid * 0.83,
     this.isActive = false,              // Активность. Если false отключаем update
@@ -352,7 +363,7 @@ function copter() {
     this.updateFields = function()
     {
         this.x = config.grid * 2.5;           
-        this.y = canvas.height/2;
+        this.y = canvas.height * (this.y / canvas.height);
         this.width = config.grid * 0.83;
         this.height = config.grid * 0.83;
         this.gravity = config.grid * 3.96;
@@ -471,17 +482,17 @@ var levelManager = {
 
     updateButtonsMap(){
         // Перебираем меню карт
-        for (let i = 0; i < levelButtoms.length; i++) {
+        for (let i = 0; i < levelbuttons.length; i++) {
 
             // Заблокированные кнопки (не пройденные карты)
             if (localStorage.getItem("map") < i ){
-                levelButtoms[i].disabled = true;
+                levelbuttons[i].disabled = true;
             }
             else if (levelManager.currentLevelId == i){
-                levelButtoms[i].disabled = false;
+                levelbuttons[i].disabled = false;
             }
             else {
-                levelButtoms[i].disabled = false;
+                levelbuttons[i].disabled = false;
             }
         }
     },
@@ -502,10 +513,10 @@ var levelManager = {
                 let block = levelManager.currentLevel.get(i)[j];
                 let color = levelManager.colorsBlock[block.t];
                 // + 1 к ширине, что-бы карта не полосила при движении
-                drawRect({x: block.x * config.grid + levelManager.x, y: block.y * config.grid}, {x: config.grid+1, y: config.grid}, color);
+                drawRect({x: block.x * config.grid + levelManager.x, y: block.y * config.grid}, {x: config.grid+1, y: config.grid+1}, color);
             }
         }
-
+        canvas.style.backgroundPosition = levelManager.x.toString();
 
     },
 
@@ -567,7 +578,7 @@ function update() {
 
 function render (){
     if (game.currentState == GameStates.LEVEL_SELECTION) return;
-    ctx.clearRect(0,0,canvas.width, canvas.height);
+    clearCanvas();
     
     game.copter.render();
     levelManager.render();

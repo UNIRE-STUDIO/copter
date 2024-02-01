@@ -13,7 +13,7 @@
         <div id="game">
                 <div class="game-header">
                     <span id="fpsCounter">FPS: 0</span>
-                    <span id="scoreCounter">0</span>
+                    <span id="level-counter">Уровень: 0</span>
                     <button class="button" id="pause-button" name="pause" type="button">||</button>
                 </div>
                 <div class="canvas-wrapper">
@@ -22,28 +22,35 @@
                         <div class="panel" id="level-menu-panel">
                             <p id="levels-label">Уровни</p>
                             <div id="list-levels">
-                                <button class="button level-buttoms" name="level-buttoms" type="button"><p>1</p></button>
-                                <button class="button level-buttoms" name="level-buttoms" type="button"><p>2</p></button>
-                                <button class="button level-buttoms" name="level-buttoms" type="button"><p>3</p></button>
-                                <button class="button level-buttoms" name="level-buttoms" type="button"><p>4</p></button>
-                                <button class="button level-buttoms" name="level-buttoms" type="button"><p>5</p></button>
-                                <button class="button level-buttoms" name="level-buttoms" type="button"><p>6</p></button>
-                                <button class="button level-buttoms" name="level-buttoms" type="button"><p>7</p></button>
-                                <button class="button level-buttoms" name="level-buttoms" type="button"><p>8</p></button>
-                                <button class="button level-buttoms" name="level-buttoms" type="button"><p>9</p></button>
-                                <button class="button level-buttoms" id="custom-maps-button" type="button">CUSTOM MAP</button>
+                                <button class="button level-buttons" name="level-buttons" type="button"><p>1</p></button>
+                                <button class="button level-buttons" name="level-buttons" type="button"><p>2</p></button>
+                                <button class="button level-buttons" name="level-buttons" type="button"><p>3</p></button>
+                                <button class="button level-buttons" name="level-buttons" type="button"><p>4</p></button>
+                                <button class="button level-buttons" name="level-buttons" type="button"><p>5</p></button>
+                                <button class="button level-buttons" name="level-buttons" type="button"><p>6</p></button>
+                                <button class="button level-buttons" name="level-buttons" type="button"><p>7</p></button>
+                                <button class="button level-buttons" name="level-buttons" type="button"><p>8</p></button>
+                                <button class="button level-buttons" name="level-buttons" type="button"><p>9</p></button>
+                                <button class="button level-buttons" id="custom-map-button" type="button">CUSTOM</button>
                             </div>
                         </div>
                         <div class="panel" id="pause-panel">
-                            <button id="continue-button" name="continue" type="button">ПРОДОЛЖИТЬ</button>
+                            <p>Пауза</p>
+                            <div class="horizontal-container">
+                                <button class="button menu-button" name="menu-button" type="button">Меню</button>
+                                <button class="button" id="continue-button" name="continue" type="button">Продолжить</button>
+                            </div>
                         </div>
                         <div class="panel" id="game-over-panel">
-                            <p id="you-lose">Вы проиграли</p>
-                            <button class="button" id="restart-button" name="restart" type="button">РЕСТАРТ</button>
+                            <p>Вы проиграли</p>
+                            <div class="horizontal-container">
+                                <button class="button menu-button" name="menu-button" type="button">Меню</button>
+                                <button class="button" id="restart-button" name="restart" type="button">Рестарт</button>
+                            </div>
                         </div>
                         <div class="panel" id="finish-level-panel">
-                            <p id="well-done">Уровень пройден!</p>
-                            <button id="next-level-button" name="next-level" type="button">Следующий уровень</button>
+                            <p>Уровень пройден!</p>
+                            <button class="button" id="next-level-button" name="next-level" type="button">Следующий уровень</button>
                         </div>
                         <div class="panel" id="pressKeyToStart">
                             <p>Нажми пробел, что-бы начать</p>
