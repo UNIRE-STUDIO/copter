@@ -81,6 +81,11 @@ continueCustomMapButton.onclick = function () {
 
 // ЗАГРУЗКА ДОКУМЕНТА ..........................................
 document.addEventListener('DOMContentLoaded', function() {
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) 
+    {
+        config.updateConfigForSmartphone();         //  Меняем настройки под мобильный телефон
+    }
+
     config.resizeGame();
     levelManager.initialization();
     game.changeState(GameStates.LEVEL_SELECTION);
@@ -96,7 +101,7 @@ pressKeyToStart.addEventListener('click', function(evt) {
 
 document.addEventListener('mousedown', function(evt) 
 {
-    if (game.currentState == GameStates.PLAY){
+    if (game.currentState == GameStates.PLAY && !config.smartphoneMode){
         game.copter.jump();
     }
 }, false);
@@ -130,6 +135,45 @@ window.addEventListener('resize', function() {
 }, true);
 
 // СУЩНОСТИ ....................................................................
+
+var config = {
+    grid: 48, // Размер сетки
+    h: canvas.height / 100,
+    w: canvas.width / 100,
+    smartphoneMode: false,
+
+    updateConfigForSmartphone() {
+        config.smartphoneMode = true;
+    },
+
+    resizeGame(){
+        var newHeight = window.innerHeight * 0.76;
+        var newWidth = window.innerWidth * 0.9;
+
+        if (game.currentState != GameStates.LEVEL_SELECTION)
+        {
+            // Стараемся сохранить относительное положение коптера
+            var relativePosX = game.copter.x / canvas.width * newWidth;
+            var relativePosY = game.copter.y / canvas.height * newHeight;
+            game.copter.x = relativePosX;
+            game.copter.y = relativePosY;
+
+            relativePosX = levelManager.x / canvas.height * newHeight;
+            levelManager.x = relativePosX;
+        }
+
+        canvas.width = newWidth;
+        canvas.height = newHeight;
+        
+        config.h = canvas.height / 100;
+        config.w = canvas.width / 100;
+
+        config.grid = canvas.height/10;
+        
+        game.copter?.updateFields();
+        levelManager.updateFields();
+    }
+}
 
 // Состояния в которых игра может находиться
 const GameStates = {LEVEL_SELECTION: 0, READYTOPLAY: 1, PLAY: 2, PAUSE: 3, GAMEOVER: 4, WIN: 5}
@@ -257,44 +301,6 @@ var game = {
     addScore(){
         game.score++;
     },
-}
-
-var config = {
-    grid: 48, // Размер сетки
-    h: canvas.height / 100,
-    w: canvas.width / 100,
-
-    updateConfigForAndroid() {
-        
-    },
-
-    resizeGame(){
-        var newHeight = window.innerHeight * 0.76;
-        var newWidth = window.innerWidth * 0.9;
-
-        if (game.currentState != GameStates.LEVEL_SELECTION)
-        {
-            // Стараемся сохранить относительное положение коптера
-            var relativePosX = game.copter.x / canvas.width * newWidth;
-            var relativePosY = game.copter.y / canvas.height * newHeight;
-            game.copter.x = relativePosX;
-            game.copter.y = relativePosY;
-
-            relativePosX = levelManager.x / canvas.height * newHeight;
-            levelManager.x = relativePosX;
-        }
-
-        canvas.width = newWidth;
-        canvas.height = newHeight;
-        
-        config.h = canvas.height / 100;
-        config.w = canvas.width / 100;
-
-        config.grid = canvas.height/10;
-        
-        game.copter?.updateFields();
-        levelManager.updateFields();
-    }
 }
 
 function copter() {
