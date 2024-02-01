@@ -13,9 +13,20 @@ var ctx = canvas.getContext('2d');
 
 var fpsCounter = document.getElementById("fpsCounter");
 
+document.getElementById("back-button").onclick = function() {
+    if (game.currentState == GameStates.CMAPINSTRUCTIONS){
+        game.changeState(GameStates.LEVEL_SELECTION);
+    }
+    if (game.currentState == GameStates.PLAY ||
+        game.currentState == GameStates.READYTOPLAY)
+    {
+        game.changeState(GameStates.LEVEL_SELECTION);
+    }
+}
+
 // Пауза
 var pauseButton = document.getElementById("pause-button"); 
-document.getElementById("pause-button").onclick = function() {
+pauseButton.onclick = function() {
     game.changeState(GameStates.PAUSE);
 }
 var pausePanel = document.getElementById("pause-panel");
@@ -42,6 +53,11 @@ var pressKeyToStart = document.getElementById("pressKeyToStart");
 var finishLevel = document.getElementById("finish-level-panel");
 document.getElementById("next-level-button").onclick = function () 
 {
+    if (levelManager.currentLevelId == -1) 
+    {
+        game.changeState(GameStates.LEVEL_SELECTION);
+        return;
+    }
     game.loadGame(levelManager.currentLevelId+1);
 }
 
@@ -56,28 +72,31 @@ for (let i = 0; i < levelbuttons.length; i++) {
 
 // При нажатии на кнопку CUSTOM MAP
 document.getElementById("custom-map-button").onclick = function () {
-    if (localStorage.getItem("mapeditor") != null)
+    if (localStorage.getItem("mapeditor") == null ||
+        localStorage.getItem("mapeditor") == "")
     {
-        game.loadGame(-1);
+        game.changeState(GameStates.CMAPINSTRUCTIONS);
+        continueCustomMapButton.disabled = true;
     }
     else 
     {
-        
+        levelManager.loadCustomMap();
+        game.changeState(GameStates.READYTOPLAY);
     }
+}
+
+var continueCustomMapButton = document.getElementById("continue-custom-button");
+continueCustomMapButton.onclick = function () 
+{
+    game.changeState(GameStates.READYTOPLAY);
 }
 
 var openMapEditorInstructions = document.getElementById("open-mapeditor-instructions");
 openMapEditorInstructions.addEventListener('click', function(evt) {
-    levelManager.currentLevel = []; // Отключаем отрисовку карты
-    game.customMapMenu();
+    game.changeState(GameStates.CMAPINSTRUCTIONS);
 }, false);
 
 var instructionsRulesToMapeditor = document.getElementById("instructions-rules-to-mapeditor");
-
-var continueCustomMapButton = document.getElementById("continue-custom-map-button");
-continueCustomMapButton.onclick = function () {
-    game.changeState(GameStates.PLAY);
-}
 
 // ЗАГРУЗКА ДОКУМЕНТА ..........................................
 document.addEventListener('DOMContentLoaded', function() {
@@ -150,7 +169,8 @@ var config = {
         var newHeight = window.innerHeight * 0.76;
         var newWidth = window.innerWidth * 0.9;
 
-        if (game.currentState != GameStates.LEVEL_SELECTION)
+        if (game.currentState != GameStates.LEVEL_SELECTION &&
+            game.currentState != GameStates.CMAPINSTRUCTIONS)
         {
             // Стараемся сохранить относительное положение коптера
             var relativePosX = game.copter.x / canvas.width * newWidth;
@@ -176,7 +196,16 @@ var config = {
 }
 
 // Состояния в которых игра может находиться
-const GameStates = {LEVEL_SELECTION: 0, READYTOPLAY: 1, PLAY: 2, PAUSE: 3, GAMEOVER: 4, WIN: 5}
+const GameStates = 
+{
+    LEVEL_SELECTION: 0, 
+    READYTOPLAY: 1, 
+    PLAY: 2, 
+    PAUSE: 3, 
+    GAMEOVER: 4, 
+    WIN: 5, 
+    CMAPINSTRUCTIONS: 6,
+}
 
 var game = {
     score: 0,
@@ -205,6 +234,10 @@ var game = {
             case GameStates.WIN:
                 game._Win();
             break;
+            case GameStates.CMAPINSTRUCTIONS:
+                game._CustomMapInstructions();
+            break;
+            
             default:
                 break;
         }
@@ -217,6 +250,9 @@ var game = {
         pausePanel.style.display = "none";
         finishLevel.style.display = "none";
         gameOverPanel.style.display = "none";
+        pressKeyToStart.style.display = "none";
+        instructionsRulesToMapeditor.style.display = "none";
+        levelCounter.innerHTML = "";
         game.copter = null;
         clearCanvas();
         game.currentState = GameStates.LEVEL_SELECTION;
@@ -228,6 +264,11 @@ var game = {
         pressKeyToStart.style.display = "flex";
         instructionsRulesToMapeditor.style.display = "none";
         levelMenuPanel.style.display = "none";
+        if (levelManager.currentLevelId == -1)
+        {
+            openMapEditorInstructions.style.display = "block";
+            levelCounter.innerHTML = "Пользовательский уровень";
+        }
         
         levelManager.turnOffMove();
         game.copter = new copter();
@@ -282,16 +323,20 @@ var game = {
         finishLevel.style.display = "block";
         game.currentState = GameStates.WIN;
     },
+    _CustomMapInstructions()
+    {
+        pauseButton.style.display = "none";
+        gameOverPanel.style.display = "none";
+        finishLevel.style.display = "none";
+        levelMenuPanel.style.display = "none";
+        pressKeyToStart.style.display = "none";
+
+        instructionsRulesToMapeditor.style.display = "block";
+        game.currentState = GameStates.CMAPINSTRUCTIONS;
+    },
     //................................................................
 
     loadGame(level){
-        if (level == -1) 
-        {
-            game.changeState(GameStates.READYTOPLAY);
-            levelManager.currentLevelId = level;
-            levelManager.loadCustomMap();
-            levelCounter.innerHTML = "Пользовательский уровень";
-        }
         if (levelManager.levels.length-1 < level) return; // Если уровня нет, то ничего не делаем
         game.changeState(GameStates.READYTOPLAY);
         levelManager.currentLevelId = level;
@@ -429,7 +474,8 @@ var levelManager = {
     initializationMaps(objMaps){
         levelManager.levels = levelManager.parseObjectToMap(objMaps);
         levelManager.loadCurrentMap();
-        if (localStorage.getItem("mapeditor") != null){
+        if (localStorage.getItem("mapeditor") != null && 
+        localStorage.getItem("mapeditor") != ""){
             var objCustomMap = JSON.parse(localStorage.getItem("mapeditor"));
             levelManager.customMap = levelManager.parseObjectToMap(objCustomMap)[0];
         }
@@ -477,6 +523,7 @@ var levelManager = {
         levelManager.currentLevelId = -1;
         levelManager.currentLevel = levelManager.customMap;
         if (localStorage.getItem("mapeditor") == null) return;
+
         // Вычисляем конец карты
         let array = Array.from(levelManager.currentLevel.values());
         levelManager.currentLevelLength = array[array.length-1][0].x+1;
@@ -493,9 +540,6 @@ var levelManager = {
                 levelbuttons[i].disabled = true;
             }
             else if (levelManager.currentLevelId == i){
-                levelbuttons[i].disabled = false;
-            }
-            else {
                 levelbuttons[i].disabled = false;
             }
         }
@@ -581,7 +625,8 @@ function update() {
 }
 
 function render (){
-    if (game.currentState == GameStates.LEVEL_SELECTION) return;
+    if (game.currentState == GameStates.LEVEL_SELECTION ||
+        game.currentState == GameStates.CMAPINSTRUCTIONS) return;
     clearCanvas();
     
     game.copter.render();

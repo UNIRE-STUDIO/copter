@@ -1,12 +1,13 @@
 /* Общие классы */
 .panel {
-    padding: 5%;
+    padding: 5vh;
     color: #c2c2c2;
 
     text-align: center;
 
     display: none;
     justify-content: center;
+    flex-direction: column;
 
     border-radius: 15px;
     background: #1010137b;
@@ -16,6 +17,7 @@
 
 .panel > p {
     margin-top: 0;
+    margin-bottom: 3vh;
     font-size: 2rem;
 }
 
@@ -36,6 +38,13 @@
 .button:hover{
     box-shadow:0px -4px 0 #05ac05 inset;
     cursor: pointer;
+}
+
+.button[disabled] {
+    color: #666666;
+    background: #2a2a2cdc;
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
 .horizontal-container
@@ -72,6 +81,11 @@ body{
     border-radius: 9px;
 }
 
+#fpsCounter {
+    color: #e3ed04;
+    font-size:8pt;
+}
+
 /*       GAME HEADER         */
 
 .game-header {
@@ -91,10 +105,7 @@ body{
 
 /* ----- */
 
-#fpsCounter {
-    color: #e3ed04;
-    font-size:8pt;
-    
+#back-button {
     grid-column: 1;
     grid-row: 1;
 }
@@ -165,41 +176,22 @@ body{
     gap: 10px;
 }
 
-.level-buttons {
-    padding: 25px 0px;
-    font-size: auto;
-}
-
-.level-buttons[disabled] {
-    color: #666666;
-    background: #2a2a2cdc;
-    cursor: not-allowed;
-    box-shadow: none;
-}
-
 /* ---------- */
 
-#open-mapeditor-instructions{
-    color: #c2c2c2;
-    top: 54%;
-    width: 100%;
-    position: absolute;
-    display: none;
-    justify-content: center;
-    transition:all 0.3s;
+#pressKeyToStart > p{
+    margin: 0;
 }
-#open-mapeditor-instructions a
+
+#open-mapeditor-instructions
 {
     color: #c2c2c2;
     text-decoration: none;
     transition:all 0.3s;
 }
-#open-mapeditor-instructions a:hover
+#open-mapeditor-instructions:hover
 {
     color: #05ac05;
     text-decoration: none;
-}
-#open-mapeditor-instructions:hover{
     cursor: pointer;
 }
 
@@ -222,34 +214,8 @@ body{
 
 /* Инструкция и правила к редактору карт */
 
-#instructions-rules-to-mapeditor{
-    top: 1%;
-    width: 100%;
-    text-align: center;
-    
-    position: absolute;
-    flex-direction: column;
-    align-items: center;
-    display: none;
-}
-#text-header{
-    font-size: 20px;
-    color: #c2c2c2;
-}
-
-#text-header p{
-    margin: 10px;
-}
-
-#instructions-rules{
-    display: flex;
-}
-
 .enum{
-    width: 450px;
     text-align: left;
-    padding: 5px 30px;
-    margin: 0px 20px;
 }
 
 .enum p{
@@ -260,7 +226,7 @@ body{
 .enum ul{
     padding-left: 10;
     overflow-y: scroll;
-    height: 200px;
+    height: 20vh;
 }
 .enum ul::-webkit-scrollbar{
     width: 8px;
@@ -275,7 +241,7 @@ body{
 }
 
 .enum li{
-    margin: 10px;
+    margin: 0px 5px 10px 10px;
 }
 
 #rules{
