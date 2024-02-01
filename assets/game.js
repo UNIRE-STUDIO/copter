@@ -269,6 +269,10 @@ var game = {
             openMapEditorInstructions.style.display = "block";
             levelCounter.innerHTML = "Пользовательский уровень";
         }
+        else
+        {
+            openMapEditorInstructions.style.display = "none";
+        }
         
         levelManager.turnOffMove();
         game.copter = new copter();

@@ -178,12 +178,10 @@ body{
 
 /* ---------- */
 
-#pressKeyToStart > p{
-    margin: 0;
-}
 
 #open-mapeditor-instructions
 {
+    margin-top: 10px;
     color: #c2c2c2;
     text-decoration: none;
     transition:all 0.3s;
@@ -198,19 +196,18 @@ body{
 /* Нажми на пробел */
 
 #pressKeyToStart {
-    top: 35%;
-    width: 100%;
     font-weight: bold;
-    font-size: 20px;
+    font-size: auto;
 }
 
 #pressKeyToStart:hover {
     cursor: pointer;
 }
 
-#pressKeyToStart p{
-    padding: 20px 60px;
+#pressKeyToStart > p{
+    margin: 0;
 }
+
 
 /* Инструкция и правила к редактору карт */
 
