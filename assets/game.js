@@ -81,10 +81,6 @@ continueCustomMapButton.onclick = function () {
 
 // ЗАГРУЗКА ДОКУМЕНТА ..........................................
 document.addEventListener('DOMContentLoaded', function() {
-
-     // Внутренний размер окна — это ширина и высота области просмотра (вьюпорта).
-    // console.log(window.innerHeight);
-
     config.resizeGame();
     levelManager.initialization();
     game.changeState(GameStates.LEVEL_SELECTION);
@@ -98,17 +94,19 @@ pressKeyToStart.addEventListener('click', function(evt) {
     game.changeState(GameStates.PLAY);
 }, false);
 
-canvas.addEventListener('click', function(evt) {
-    var mousePos = getMousePos(canvas, evt);
-    /*
-    if (isInside(mousePos, panelPause)){
-        game.isPause = false;
-    }
-    */
-    if (game.currentState == GameStates.READYTOPLAY){
-        game.changeState(GameStates.PLAY);
+document.addEventListener('mousedown', function(evt) 
+{
+    if (game.currentState == GameStates.PLAY){
+        game.copter.jump();
     }
 }, false);
+
+document.addEventListener('touchstart', function (e) {
+    if (game.currentState == GameStates.PLAY)
+    {
+        game.copter.jump();
+    }
+});
 
 // Отлавливаев ввод с клавиатуры
 document.addEventListener('keydown', function() {

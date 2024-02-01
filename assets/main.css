@@ -10,6 +10,8 @@
 
     border-radius: 15px;
     background: #1010137b;
+
+    -moz-user-select: none;    -o-user-select: none;    -khtml-user-select: none;    -webkit-user-select: none;    user-select: none;
 }
 
 .panel > p {
