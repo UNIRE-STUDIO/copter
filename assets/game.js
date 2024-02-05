@@ -18,10 +18,14 @@ document.getElementById("back-button").onclick = function() {
         game.changeState(GameStates.LEVEL_SELECTION);
     }
     if (game.currentState == GameStates.PLAY ||
-        game.currentState == GameStates.READYTOPLAY)
+        game.currentState == GameStates.READYTOPLAY ||
+        game.currentState == GameStates.GAMEOVER ||
+        game.currentState == GameStates.WIN ||
+        game.currentState == GameStates.PAUSE)
     {
         game.changeState(GameStates.LEVEL_SELECTION);
     }
+    
 }
 
 // Пауза
@@ -98,6 +102,20 @@ openMapEditorInstructions.addEventListener('click', function(evt) {
 
 var instructionsRulesToMapeditor = document.getElementById("instructions-rules-to-mapeditor");
 
+var fullscreenButton =  document.getElementById("fullscreen-button");
+fullscreenButton.onclick = () => {
+    if (window.innerHeight === screen.height)
+    {
+        config.fullScreenCancel();
+    }
+    else
+    {
+        config.fullScreen();
+    }
+    
+
+};
+
 // ЗАГРУЗКА ДОКУМЕНТА ..........................................
 document.addEventListener('DOMContentLoaded', function() {
     if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) 
@@ -153,6 +171,12 @@ window.addEventListener('resize', function() {
     config.resizeGame();
 }, true);
 
+// Прослушка события смены ориентации
+window.addEventListener("orientationchange", function() {
+    if (game.currentState == GameStates.PLAY) game.changeState(GameStates.PAUSE);
+    config.resizeGame();
+}, false);
+
 // СУЩНОСТИ ....................................................................
 
 var config = {
@@ -160,14 +184,24 @@ var config = {
     h: canvas.height / 100,
     w: canvas.width / 100,
     smartphoneMode: false,
+    canvasWidth: 0.9,
+    canvasHeight: 0.76,
 
     updateConfigForSmartphone() {
         config.smartphoneMode = true;
+        config.canvasHeight = 0.8;
+        config.canvasWidth = 1;
     },
 
     resizeGame(){
-        var newHeight = window.innerHeight * 0.76;
-        var newWidth = window.innerWidth * 0.9;
+        if (config.smartphoneMode)
+        {
+            if (window.innerHeight > window.innerWidth) config.canvasHeight = 0.5;
+            else config.canvasHeight = 0.8;
+        }
+        
+        var newHeight = window.innerHeight * config.canvasHeight;
+        var newWidth = window.innerWidth * config.canvasWidth;
 
         if (game.currentState != GameStates.LEVEL_SELECTION &&
             game.currentState != GameStates.CMAPINSTRUCTIONS)
@@ -192,6 +226,31 @@ var config = {
         
         game.copter?.updateFields();
         levelManager.updateFields();
+    },
+    fullScreen() {
+        let elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+          } else if (elem.mozRequestFullScreen) { /* Firefox */
+            elem.mozRequestFullScreen();
+          } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+            elem.webkitRequestFullscreen();
+          } else if (elem.msRequestFullscreen) { /* IE/Edge */
+            elem.msRequestFullscreen();
+          }
+        config.resizeGame();
+    },
+    fullScreenCancel() {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) { /* Firefox */
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { /* IE/Edge */
+            document.msExitFullscreen();
+        }
+        config.resizeGame();
     }
 }
 
@@ -252,6 +311,7 @@ var game = {
         gameOverPanel.style.display = "none";
         pressKeyToStart.style.display = "none";
         instructionsRulesToMapeditor.style.display = "none";
+        fullscreenButton.style.display = "block";
         levelCounter.innerHTML = "";
         game.copter = null;
         clearCanvas();
@@ -264,6 +324,7 @@ var game = {
         pressKeyToStart.style.display = "flex";
         instructionsRulesToMapeditor.style.display = "none";
         levelMenuPanel.style.display = "none";
+        fullscreenButton.style.display = "none";
         if (levelManager.currentLevelId == -1)
         {
             openMapEditorInstructions.style.display = "block";
@@ -329,6 +390,7 @@ var game = {
     },
     _CustomMapInstructions()
     {
+        fullscreenButton.style.display = "none";
         pauseButton.style.display = "none";
         gameOverPanel.style.display = "none";
         finishLevel.style.display = "none";
@@ -574,6 +636,7 @@ var levelManager = {
 
     updateFields(){
         levelManager.speed = config.grid * 1.7;
+        levelManager.finish = (levelManager.currentLevelLength - levelManager.OffsetFromTheEnd) * config.grid;
     }
 }
 

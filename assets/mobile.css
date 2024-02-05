@@ -1,6 +1,6 @@
 /* Общие классы */
 .panel {
-    padding: 5vh;
+    padding: 20px;
     color: #c2c2c2;
 
     text-align: center;
@@ -18,7 +18,7 @@
 .panel > p {
     margin-top: 0;
     margin-bottom: 3vh;
-    font-size: 2rem;
+    font-size: 2.4dvw;
 }
 
 .button {
@@ -26,9 +26,9 @@
     background: #101013dc;
     border: none;
     color: #c2c2c2;
-    padding: 15px 25px;
+    padding: 1dvh 15px;
 
-    font-size: min(max(1.5vw, 1.8vw), 1.5vw);
+    font-size: 1.9dvw;
 
     -moz-user-select: none;    -o-user-select: none;    -khtml-user-select: none;    -webkit-user-select: none;    user-select: none;
 
@@ -47,6 +47,12 @@
     box-shadow: none;
 }
 
+.header-buttons
+{
+    padding: 5px 15px;
+    font-size: max(20px, 2vh);
+}
+
 .horizontal-container
 {
     display: grid;
@@ -55,26 +61,20 @@
     gap: 10%;
     
     margin-bottom: 10px;
-    padding: 0 40px;
+    padding: 0 5px;
 }
 /* ------------------------*/
 
 body{
     margin: 0px;
     font-family: sans-serif;
-    background: #353336;
-    width: 100vw;
-    height: 100vh;
+    background-color: #161618;
+    width: 100dvw;
+    height: 100dvh;
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-#game {
-    padding: 10px 20px 10px 20px;
-    background-color: #161618;
-    box-shadow: 0px -1px 0 #05ac05 inset, 0px 0px 40px 10px #161618;
-    border-radius: 9px;
+    overflow:hidden;
 }
 
 #fpsCounter {
@@ -85,8 +85,7 @@ body{
 /*       GAME HEADER         */
 
 .game-header {
-    padding-top: 1vmin;
-    padding-bottom: 1vmin;
+    padding: 1vmin 2vmin;
     min-height: 50px;
 
     display: grid;
@@ -114,8 +113,6 @@ body{
 }
 
 #pause-button {
-    font-size: 15px;
-    font-weight: bolder;
     border-radius: 10px;
     grid-column: 3;
     grid-row: 1;
@@ -135,8 +132,7 @@ body{
     border-radius: 5px;
     border-bottom: 3px solid #818274;
     border-top: 3px solid #818274;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 32 32' fill='none'%3E%3Ccircle cx='8' cy='8' r='1' fill='%23444444'/%3E%3C/svg%3E"),
-            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 96 96' fill='none'%3E%3Ccircle cx='8' cy='8' r='3' fill='%23444444'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 32 32' fill='none'%3E%3Ccircle cx='8' cy='8' r='1' fill='%23444444'/%3E%3C/svg%3E");
     background-position: 0px;
       
 }
@@ -144,8 +140,7 @@ body{
 /*  UI-IN-CANVAS  */
 
 .ui-in-canvas{
-    width: 70%;
-    height: 60%;
+    padding: 0 2dvw;
 
     margin: auto;
 
@@ -207,6 +202,15 @@ body{
 
 /* Инструкция и правила к редактору карт */
 
+#instructions-rules-to-mapeditor{
+    font-size: 1.7dvw;
+}
+
+#instructions-header p{
+    margin: 3px;
+    
+}
+
 .enum{
     text-align: left;
 }
@@ -254,11 +258,11 @@ body{
 /*       FOOTER         */
 
 .footer {
-    margin-top: 5px;
     font-size: 12px;
     display: flex;
     justify-content: space-between;
     color: #b4b4b4;
+    padding: 1 10vmin;
 }
 
 /* --------------------------------- */

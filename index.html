@@ -1,102 +1,119 @@
-<html>
-
+<html lang="ru">
 <head>
     <meta charset="utf-8" />
     <title>Copter</title>
-    <link rel="stylesheet" href="assets/main.css">
+    <script>
+        let cssId = 'myCss';  // you could encode the css path itself to generate id..
+        const main = 'assets/main.css';
+        const mobileStyle = 'assets/mobile.css';
+
+        // В зависимости от устройства подключаем разные таблицы стилей
+        var uagent = navigator.userAgent.toLowerCase();
+        let currentStyle = (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) ? mobileStyle : main;
+        if (!document.getElementById(cssId))
+            {
+                var head  = document.getElementsByTagName('head')[0];
+                var link  = document.createElement('link');
+                link.id   = cssId;
+                link.rel  = 'stylesheet';
+                link.type = 'text/css';
+                link.href = currentStyle;
+                link.media = 'all';
+                head.appendChild(link);
+            }
+    </script>
     <!--Запретить масштабирование-->
     <meta name="viewport" content="user-scalable=no">
 </head>
 
 <body>
-    <div id="page">
-        <div id="game">
-            <span id="fpsCounter">FPS: 0</span>
-            <div class="game-header">
-                <button class="button" id="back-button" name="back" type="button">⇐</button>
-                <span id="level-counter">Уровень: 0</span>
-                <button class="button" id="pause-button" name="pause" type="button">||</button>
-            </div>
-            <div class="canvas-wrapper">
-                <canvas id="myCanvas"></canvas>
-                <div class="ui-in-canvas">
-                    <div class="panel" id="level-menu-panel">
-                        <p id="levels-label">Уровни</p>
-                        <div id="list-levels">
-                            <button class="button level-buttons" name="level-buttons" type="button"><p>1</p></button>
-                            <button class="button level-buttons" name="level-buttons" type="button"><p>2</p></button>
-                            <button class="button level-buttons" name="level-buttons" type="button"><p>3</p></button>
-                            <button class="button level-buttons" name="level-buttons" type="button"><p>4</p></button>
-                            <button class="button level-buttons" name="level-buttons" type="button"><p>5</p></button>
-                            <button class="button level-buttons" name="level-buttons" type="button"><p>6</p></button>
-                            <button class="button level-buttons" name="level-buttons" type="button"><p>7</p></button>
-                            <button class="button level-buttons" name="level-buttons" type="button"><p>8</p></button>
-                            <button class="button level-buttons" name="level-buttons" type="button"><p>9</p></button>
-                            <button class="button" id="custom-map-button" type="button">CUSTOM</button>
-                        </div>
+    <div id="game">
+        <div class="game-header">
+            <button class="button header-buttons" id="back-button" name="back" type="button">⇐</button>
+            <span id="level-counter">Уровень: 0</span>
+            <button class="button header-buttons" id="pause-button" name="pause" type="button">||</button>
+            <button class="button header-buttons" id="fullscreen-button" name="fullscreen" type="button">⛶</button>
+        </div>
+        <div class="canvas-wrapper">
+            <canvas id="myCanvas"></canvas>
+            <div class="ui-in-canvas">
+                <div class="panel" id="level-menu-panel">
+                    <p id="levels-label">Уровни</p>
+                    <div id="list-levels">
+                        <button class="button level-buttons" name="level-buttons" type="button"><p>1</p></button>
+                        <button class="button level-buttons" name="level-buttons" type="button"><p>2</p></button>
+                        <button class="button level-buttons" name="level-buttons" type="button"><p>3</p></button>
+                        <button class="button level-buttons" name="level-buttons" type="button"><p>4</p></button>
+                        <button class="button level-buttons" name="level-buttons" type="button"><p>5</p></button>
+                        <button class="button level-buttons" name="level-buttons" type="button"><p>6</p></button>
+                        <button class="button level-buttons" name="level-buttons" type="button"><p>7</p></button>
+                        <button class="button level-buttons" name="level-buttons" type="button"><p>8</p></button>
+                        <button class="button level-buttons" name="level-buttons" type="button"><p>9</p></button>
+                        <button class="button" id="custom-map-button" type="button">CUSTOM</button>
                     </div>
-                    <div class="panel" id="pause-panel">
-                        <p>Пауза</p>
-                        <div class="horizontal-container">
-                            <button class="button menu-button" name="menu-button" type="button">Меню</button>
-                            <button class="button" id="continue-button" name="continue" type="button">Продолжить</button>
-                        </div>
-                    </div>
-                    <div class="panel" id="game-over-panel">
-                        <p>Вы проиграли</p>
-                        <div class="horizontal-container">
-                            <button class="button menu-button" name="menu-button" type="button">Меню</button>
-                            <button class="button" id="restart-button" name="restart" type="button">Рестарт</button>
-                        </div>
-                    </div>
-                    <div class="panel" id="finish-level-panel">
-                        <p>Уровень пройден!</p>
-                        <button class="button" id="next-level-button" name="next-level" type="button">Следующий уровень</button>
-                    </div>
-                    <div class="panel" id="pressKeyToStart">
-                        <p>Нажми пробел, что-бы начать</p>
-                        <a id="open-mapeditor-instructions">-- Map Editor --</a>
-                    </div>
-                    <div class="panel" id="instructions-rules-to-mapeditor">
-                        <div id="text-header">
-                            <p>У вас есть возможность создать собственную карту в нашем онлайн редакторе карт.</p>
-                            <p>Поскольку редактор карт универсален, вам потребуется соблюдать несколько простых</p>
-                            <p>требований для того, что-бы игра работала с вашей картой коррекно</p>
-                        </div>
-                        <div id="instructions-rules" class="horizontal-container">
-                            <div id="instructions" class="enum">
-                                <p>Инструкция</p>
-                                <ul>
-                                    <li>Ознакомьтесь с требованиями</li>
-                                    <li>Перейдите на страницу редактора</li>
-                                    <li>Задайте размеры вашей карты, затем нарисуйте её</li>
-                                    <li>С цветами блоков пока всё плохо, их надо настраивать вручную, либо вообще на них не полагаться</li>
-                                    <li>В редакторе реализовано сохранение карты в кэш, этот кэш для редактора и игры общий. После возвращения в игру созданная вами карта будет автоматически загружена</li>
-                                    <li>После того, как всё будет готово, воспользуйтесь специальной кнопкой перехода обратно в игру</li>
-                                </ul>
-                            </div>
-                            <div id="rules" class="enum">
-                                <p>Требования</p>
-                                <ul>
-                                    <li>Высота (Y) карты <b>10</b> блоков</li>
-                                    <li>Длина (X) карты не менее <b>80</b> блоков</li>
-                                    <li>Конец карты засчитывается игрой за <b>40</b> блоков до фактического конца карты</li>
-                                </ul>
-                            </div>
-                        </div>
-                            <div class="horizontal-container">
-                                <a id="open-mapeditor-button" href="https://unire-studio.github.io/map-editor/?play=https://unire-studio.github.io/copter/">
-                                    <button class="button" name="map-editor" type="button">Перейти в редактор карт</button>
-                                </a>
-                                <button class="button" id="continue-custom-button" name="continue type="button">Продолжить игру</button>
-                            </div>
-                    </div>
-
                 </div>
+                <div class="panel" id="pause-panel">
+                    <p>Пауза</p>
+                    <div class="horizontal-container">
+                        <button class="button menu-button" name="menu-button" type="button">Меню</button>
+                        <button class="button" id="continue-button" name="continue" type="button">Продолжить</button>
+                    </div>
+                </div>
+                <div class="panel" id="game-over-panel">
+                    <p>Вы проиграли</p>
+                    <div class="horizontal-container">
+                        <button class="button menu-button" name="menu-button" type="button">Меню</button>
+                        <button class="button" id="restart-button" name="restart" type="button">Рестарт</button>
+                    </div>
+                </div>
+                <div class="panel" id="finish-level-panel">
+                    <p>Уровень пройден!</p>
+                    <button class="button" id="next-level-button" name="next-level" type="button">Следующий уровень</button>
+                </div>
+                <div class="panel" id="pressKeyToStart">
+                    <p>Нажми пробел, что-бы начать</p>
+                    <a id="open-mapeditor-instructions">-- Map Editor --</a>
+                </div>
+                <div class="panel" id="instructions-rules-to-mapeditor">
+                    <div id="instructions-header">
+                        <p>У вас есть возможность создать собственную карту в нашем онлайн редакторе карт.</p>
+                        <p>Поскольку редактор карт универсален, вам потребуется соблюдать несколько простых</p>
+                        <p>требований для того, что-бы игра работала с вашей картой коррекно</p>
+                    </div>
+                    <div id="instructions-rules" class="horizontal-container">
+                        <div id="instructions" class="enum">
+                            <p>Инструкция</p>
+                            <ul>
+                                <li>Ознакомьтесь с требованиями</li>
+                                <li>Перейдите на страницу редактора</li>
+                                <li>Задайте размеры вашей карты, затем нарисуйте её</li>
+                                <li>С цветами блоков пока всё плохо, их надо настраивать вручную, либо вообще на них не полагаться</li>
+                                <li>В редакторе реализовано сохранение карты в кэш, этот кэш для редактора и игры общий. После возвращения в игру созданная вами карта будет автоматически загружена</li>
+                                <li>После того, как всё будет готово, воспользуйтесь специальной кнопкой перехода обратно в игру</li>
+                            </ul>
+                        </div>
+                        <div id="rules" class="enum">
+                            <p>Требования</p>
+                            <ul>
+                                <li>Высота (Y) карты <b>10</b> блоков</li>
+                                <li>Длина (X) карты не менее <b>80</b> блоков</li>
+                                <li>Конец карты засчитывается игрой за <b>40</b> блоков до фактического конца карты</li>
+                            </ul>
+                        </div>
+                    </div>
+                        <div class="horizontal-container">
+                            <a id="open-mapeditor-button" href="https://unire-studio.github.io/map-editor/?play=https://unire-studio.github.io/copter/">
+                                <button class="button" name="map-editor" type="button">Перейти в редактор карт</button>
+                            </a>
+                            <button class="button" id="continue-custom-button" name="continue type="button">Продолжить игру</button>
+                        </div>
+                </div>
+
             </div>
-            <div class="footer">
-                <span id="version">версия: 0.0.5</span>
-            </div>
+        </div>
+        <div class="footer">
+            <span id="version">версия: 0.0.6</span>
+            <span id="fpsCounter">FPS: 0</span>
         </div>
     </div>
     <script type="text/javascript" src="assets/game.js"></script>
