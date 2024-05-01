@@ -5,7 +5,8 @@
 */
 
 // ЗАГРУЗКА ИЗОБРАЖЕНИЙ ...........................................
-
+var copterImage = new Image();
+copterImage.src = 'assets/Copter.png';
 
 // ПОЛУЧАЕМ ССЫЛКИ НА HTML ОБЪЕКТЫ ................................
 var canvas = document.getElementById('myCanvas');
@@ -486,7 +487,7 @@ function copter() {
     },
 
     this.render = function(){
-        drawRect({x:this.x, y: this.y}, {x: this.width, y: this.height}, "#67ED31"); // Рисуем квадрат
+        ctx.drawImage(copterImage, this.x, this.y, this.width + 2, this.height + 2);
     },
 
     this.jump = function(){
@@ -695,7 +696,10 @@ function render (){
     if (game.currentState == GameStates.LEVEL_SELECTION ||
         game.currentState == GameStates.CMAPINSTRUCTIONS) return;
     clearCanvas();
-    
+    ctx.imageSmoothingEnabled = false;
+    ctx.mozImageSmoothingEnabled = false;
+    ctx.webkitImageSmoothingEnabled = false;
+    ctx.msImageSmoothingEnabled = false;
     game.copter.render();
     levelManager.render();
     // Create gradient
